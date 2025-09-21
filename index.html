@@ -378,7 +378,7 @@
                 document.querySelectorAll('.feedback-btn').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         const feedback = e.target.dataset.feedback;
-                        console.log(User provided feedback: ${feedback});
+                        console.log(`User provided feedback: ${feedback}`);
                         
                         // Hide buttons and show message
                         document.querySelector('.feedback-container').classList.add('flex-col');

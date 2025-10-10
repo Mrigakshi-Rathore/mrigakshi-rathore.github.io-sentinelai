@@ -1,922 +1,1294 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sentinel - Interactive Misinformation Detector</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <style>
-        :root {
-            --primary: #3b82f6;
-            --secondary: #8b5cf6;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            min-height: 100vh;
-        }
-        
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        
-        .gradient-text {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .pulse-animation {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        .slide-in {
-            animation: slideIn 0.5s ease-out;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        .floating {
-            animation: floating 3s ease-in-out infinite;
-        }
-        
-        @keyframes floating {
-            0% { transform: translate(0, 0px); }
-            50% { transform: translate(0, -10px); }
-            100% { transform: translate(0, 0px); }
-        }
-        
-        .progress-bar {
-            height: 8px;
-            border-radius: 4px;
-            background: #e5e7eb;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.5s ease-in-out;
-        }
-        
-        .credibility-high { background: linear-gradient(90deg, #10b981, #34d399); }
-        .credibility-medium { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
-        .credibility-low { background: linear-gradient(90deg, #ef4444, #f87171); }
-        
-        .typewriter {
-            overflow: hidden;
-            border-right: .15em solid var(--primary);
-            white-space: nowrap;
-            animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
-        }
-        
-        @keyframes typing {
-            from { width: 0 }
-            to { width: 100% }
-        }
-        
-        @keyframes blink-caret {
-            from, to { border-color: transparent }
-            50% { border-color: var(--primary); }
-        }
-        
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-        
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-        
-        .tab-active {
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            color: white;
-            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
-        }
-        
-        .glow {
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-        }
-        
-        .analysis-criteria {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 12px;
-            margin-top: 16px;
-        }
-        
-        .criteria-item {
-            display: flex;
-            align-items: center;
-            padding: 8px 12px;
-            background-color: #f8fafc;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        
-        .criteria-score {
-            margin-left: auto;
-            font-weight: 600;
-        }
-        
-        .score-high { color: #10b981; }
-        .score-medium { color: #f59e0b; }
-        .score-low { color: #ef4444; }
-        
-        .fact-check-item {
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border-left: 4px solid;
-        }
-        
-        .fact-check-true { background-color: #d1fae5; border-left-color: #10b981; }
-        .fact-check-false { background-color: #fee2e2; border-left-color: #ef4444; }
-        .fact-check-mixed { background-color: #fef3c7; border-left-color: #f59e0b; }
-        .fact-check-unverified { background-color: #e0e7ff; border-left-color: #8b5cf6; }
-        
-        .news-sample {
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-        }
-        
-        .news-sample:hover {
-            transform: translateY(-2px);
-            border-color: #3b82f6;
-        }
-        
-        .news-sample.real {
-            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-        }
-        
-        .news-sample.fake {
-            background: linear-gradient(135deg, #fee2e2, #fecaca);
-        }
-        
-        .sample-category {
-            margin-bottom: 1.5rem;
-        }
-        
-        .sample-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 12px;
-            margin-top: 8px;
-        }
-        
-        .interactive-panel {
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .interactive-panel:hover {
-            transform: scale(1.02);
-        }
-        
-        .real-time-analysis {
-            border-left: 4px solid #3b82f6;
-            background: linear-gradient(90deg, #f0f9ff, #e0f2fe);
-        }
-        
-        .pulse-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #10b981;
-            animation: pulse-dot 2s infinite;
-        }
-        
-        @keyframes pulse-dot {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0.7; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        
-        .score-animation {
-            animation: scoreCount 2s ease-out;
-        }
-        
-        @keyframes scoreCount {
-            from { transform: scale(0.5); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        
-        .criteria-bar {
-            height: 6px;
-            border-radius: 3px;
-            background-color: #e5e7eb;
-            margin-top: 4px;
-            overflow: hidden;
-        }
-        
-        .criteria-fill {
-            height: 100%;
-            border-radius: 3px;
-            transition: width 1s ease-in-out;
-        }
-        
-        .interactive-chart {
-            transition: all 0.3s ease;
-        }
-        
-        .interactive-chart:hover {
-            transform: scale(1.05);
-        }
-        
-        .comparison-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: linear-gradient(135deg, #f59e0b, #fbbf24);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-            animation: bounce 2s infinite;
-        }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-        
-        .live-indicator {
-            display: inline-flex;
-            align-items: center;
-            background: #ef4444;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-            animation: pulse 2s infinite;
-        }
-        
-        .interactive-tutorial {
-            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
-            color: white;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .interactive-tutorial:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.3);
-        }
-    </style>
-</head>
-<body class="min-h-screen">
+      :root {
+        --primary: #3b82f6;
+        --secondary: #8b5cf6;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+      }
 
+      body {
+        font-family: "Inter", sans-serif;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: 100vh;
+      }
+
+      .glass-effect {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .gradient-bg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+
+      .gradient-text {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .pulse-animation {
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .slide-in {
+        animation: slideIn 0.5s ease-out;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .floating {
+        animation: floating 3s ease-in-out infinite;
+      }
+
+      @keyframes floating {
+        0% {
+          transform: translate(0, 0px);
+        }
+        50% {
+          transform: translate(0, -10px);
+        }
+        100% {
+          transform: translate(0, 0px);
+        }
+      }
+
+      .progress-bar {
+        height: 8px;
+        border-radius: 4px;
+        background: #e5e7eb;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.5s ease-in-out;
+      }
+
+      .credibility-high {
+        background: linear-gradient(90deg, #10b981, #34d399);
+      }
+      .credibility-medium {
+        background: linear-gradient(90deg, #f59e0b, #fbbf24);
+      }
+      .credibility-low {
+        background: linear-gradient(90deg, #ef4444, #f87171);
+      }
+
+      .typewriter {
+        overflow: hidden;
+        border-right: 0.15em solid var(--primary);
+        white-space: nowrap;
+        animation: typing 3.5s steps(40, end),
+          blink-caret 0.75s step-end infinite;
+      }
+
+      @keyframes typing {
+        from {
+          width: 0;
+        }
+        to {
+          width: 100%;
+        }
+      }
+
+      @keyframes blink-caret {
+        from,
+        to {
+          border-color: transparent;
+        }
+        50% {
+          border-color: var(--primary);
+        }
+      }
+
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+
+      .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+
+      .tab-active {
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+      }
+
+      .glow {
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+      }
+
+      .analysis-criteria {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 12px;
+        margin-top: 16px;
+      }
+
+      .criteria-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        background-color: #f8fafc;
+        border-radius: 8px;
+        font-size: 14px;
+      }
+
+      .criteria-score {
+        margin-left: auto;
+        font-weight: 600;
+      }
+
+      .score-high {
+        color: #10b981;
+      }
+      .score-medium {
+        color: #f59e0b;
+      }
+      .score-low {
+        color: #ef4444;
+      }
+
+      .fact-check-item {
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        border-left: 4px solid;
+      }
+
+      .fact-check-true {
+        background-color: #d1fae5;
+        border-left-color: #10b981;
+      }
+      .fact-check-false {
+        background-color: #fee2e2;
+        border-left-color: #ef4444;
+      }
+      .fact-check-mixed {
+        background-color: #fef3c7;
+        border-left-color: #f59e0b;
+      }
+      .fact-check-unverified {
+        background-color: #e0e7ff;
+        border-left-color: #8b5cf6;
+      }
+
+      .news-sample {
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+      }
+
+      .news-sample:hover {
+        transform: translateY(-2px);
+        border-color: #3b82f6;
+      }
+
+      .news-sample.real {
+        background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+      }
+
+      .news-sample.fake {
+        background: linear-gradient(135deg, #fee2e2, #fecaca);
+      }
+
+      .sample-category {
+        margin-bottom: 1.5rem;
+      }
+
+      .sample-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 12px;
+        margin-top: 8px;
+      }
+
+      .interactive-panel {
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .interactive-panel:hover {
+        transform: scale(1.02);
+      }
+
+      .real-time-analysis {
+        border-left: 4px solid #3b82f6;
+        background: linear-gradient(90deg, #f0f9ff, #e0f2fe);
+      }
+
+      .pulse-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: #10b981;
+        animation: pulse-dot 2s infinite;
+      }
+
+      @keyframes pulse-dot {
+        0% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.5);
+          opacity: 0.7;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .score-animation {
+        animation: scoreCount 2s ease-out;
+      }
+
+      @keyframes scoreCount {
+        from {
+          transform: scale(0.5);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .criteria-bar {
+        height: 6px;
+        border-radius: 3px;
+        background-color: #e5e7eb;
+        margin-top: 4px;
+        overflow: hidden;
+      }
+
+      .criteria-fill {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 1s ease-in-out;
+      }
+
+      .interactive-chart {
+        transition: all 0.3s ease;
+      }
+
+      .interactive-chart:hover {
+        transform: scale(1.05);
+      }
+
+      .comparison-badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: bold;
+        animation: bounce 2s infinite;
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-5px);
+        }
+      }
+
+      .live-indicator {
+        display: inline-flex;
+        align-items: center;
+        background: #ef4444;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: bold;
+        animation: pulse 2s infinite;
+      }
+
+      .interactive-tutorial {
+        background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+        color: white;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .interactive-tutorial:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.3);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen">
     <!-- Hero Section -->
     <section class="py-12 md:py-20 gradient-bg text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <div class="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm mb-6">
-                    <span class="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
-                    <span class="text-sm">AI-Powered Fact Checking</span>
-                </div>
-                
-                <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                    Detect Misinformation in
-                    <span class="typewriter block md:inline">Real-Time</span>
-                </h1>
-                
-                <p class="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto mb-10">
-                    Interactive tool to identify fake news and verify content credibility with advanced AI analysis
-                </p>
-                
-                <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <button id="demo-btn" class="px-8 py-4 bg-white text-blue-600 rounded-xl font-bold text-lg hover:bg-blue-50 transition-all shadow-lg flex items-center justify-center pulse-animation">
-                        <i class="fas fa-play-circle mr-2"></i> Interactive Demo
-                    </button>
-                    <button id="tutorial-btn" class="px-8 py-4 bg-transparent border-2 border-white text-white rounded-xl font-bold text-lg hover:bg-white/10 transition-all flex items-center justify-center">
-                        <i class="fas fa-graduation-cap mr-2"></i> Quick Tutorial
-                    </button>
-                </div>
-            </div>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center">
+          <div
+            class="inline-flex items-center px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm mb-6"
+          >
+            <span class="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+            <span class="text-sm">AI-Powered Fact Checking</span>
+          </div>
+
+          <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+            Detect Misinformation in
+            <span class="typewriter block md:inline">Real-Time</span>
+          </h1>
+
+          <p class="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto mb-10">
+            Interactive tool to identify fake news and verify content
+            credibility with advanced AI analysis
+          </p>
+
+          <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <button
+              id="demo-btn"
+              class="px-8 py-4 bg-white text-blue-600 rounded-xl font-bold text-lg hover:bg-blue-50 transition-all shadow-lg flex items-center justify-center pulse-animation"
+            >
+              <i class="fas fa-play-circle mr-2"></i> Interactive Demo
+            </button>
+            <button
+              id="tutorial-btn"
+              class="px-8 py-4 bg-transparent border-2 border-white text-white rounded-xl font-bold text-lg hover:bg-white/10 transition-all flex items-center justify-center"
+            >
+              <i class="fas fa-graduation-cap mr-2"></i> Quick Tutorial
+            </button>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <!-- Interactive Tutorial -->
-        <div id="tutorial-panel" class="interactive-tutorial hidden">
-            <div class="flex justify-between items-start">
+      <!-- Interactive Tutorial -->
+      <div id="tutorial-panel" class="interactive-tutorial hidden">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="text-xl font-bold mb-2">
+              <i class="fas fa-graduation-cap mr-2"></i>How to Use This Tool
+            </h3>
+            <p class="text-blue-100">
+              Click on news samples or paste your own text to analyze
+              credibility. Watch the real-time analysis breakdown!
+            </p>
+          </div>
+          <button id="close-tutorial" class="text-white hover:text-blue-200">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+        <div
+          class="bg-white rounded-xl p-6 shadow-lg text-center card-hover interactive-panel"
+          data-info="Our AI analyzes content across 8 different credibility factors"
+        >
+          <div class="text-3xl font-bold text-blue-600 mb-2">8</div>
+          <div class="text-gray-600">Analysis Factors</div>
+        </div>
+
+        <div
+          class="bg-white rounded-xl p-6 shadow-lg text-center card-hover interactive-panel"
+          data-info="Real-time processing with instant credibility assessment"
+        >
+          <div class="text-3xl font-bold text-purple-600 mb-2">
+            <span class="live-indicator">LIVE</span>
+          </div>
+          <div class="text-gray-600">Real-Time Analysis</div>
+        </div>
+
+        <div
+          class="bg-white rounded-xl p-6 shadow-lg text-center card-hover interactive-panel"
+          data-info="Compare real vs fake news to learn detection patterns"
+        >
+          <div class="text-3xl font-bold text-green-600 mb-2">22</div>
+          <div class="text-gray-600">Test Samples</div>
+        </div>
+
+        <div
+          class="bg-white rounded-xl p-6 shadow-lg text-center card-hover interactive-panel"
+          data-info="Detailed breakdown of credibility factors with visual indicators"
+        >
+          <div class="text-3xl font-bold text-orange-600 mb-2">100%</div>
+          <div class="text-gray-600">Transparent Results</div>
+        </div>
+      </div>
+
+      <!-- News Samples for Testing -->
+      <div class="bg-white rounded-2xl shadow-xl p-6 mb-8">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+            <i class="fas fa-vial mr-3 text-blue-500"></i> Interactive Test
+            Samples
+          </h2>
+          <div class="flex items-center space-x-2">
+            <span class="text-sm text-gray-500">Click to analyze:</span>
+            <span class="flex items-center text-sm"
+              ><span class="w-3 h-3 bg-green-400 rounded-full mr-1"></span>
+              Real</span
+            >
+            <span class="flex items-center text-sm"
+              ><span class="w-3 h-3 bg-red-400 rounded-full mr-1"></span>
+              Fake</span
+            >
+          </div>
+        </div>
+        <p class="text-gray-600 mb-6">
+          Click on any sample below to test the analyzer. Watch how real and
+          fake news produce different credibility scores!
+        </p>
+
+        <div class="space-y-6">
+          <!-- Real News Samples -->
+          <div class="sample-category">
+            <h3 class="text-lg font-bold text-green-600 mb-3 flex items-center">
+              <i class="fas fa-check-circle mr-2"></i> Real News Samples
+              <span class="ml-2 text-sm font-normal text-gray-500"
+                >(High Credibility: 80-95%)</span
+              >
+            </h3>
+            <div class="sample-grid">
+              <div
+                class="news-sample real p-4 rounded-lg cursor-pointer relative interactive-panel"
+                data-content="NASA's James Webb Space Telescope has captured stunning new images of the Orion Nebula, revealing previously unseen details of star formation. The images show intricate structures within the nebula, including protoplanetary disks and young stellar objects. Scientists from the European Space Agency collaborated on this research, which was published in the peer-reviewed journal Nature Astronomy. The findings provide new insights into the early stages of star and planet formation."
+              >
+                <div class="font-semibold">
+                  Webb Telescope Reveals New Star Formation Details
+                </div>
+                <div class="text-sm text-gray-600 mt-1">
+                  Credible scientific discovery with peer-reviewed sources
+                </div>
+                <div class="comparison-badge">Click to Analyze</div>
+              </div>
+
+              <div
+                class="news-sample real p-4 rounded-lg cursor-pointer relative interactive-panel"
+                data-content="The World Health Organization has announced a new global initiative to combat antimicrobial resistance. The program will invest $100 million over five years to develop new antibiotics and improve surveillance systems. Dr. Tedros Adhanom Ghebreyesus stated: 'This is a critical step in protecting our most essential medicines.' The initiative involves collaboration with 15 countries and follows recommendations from the Global Antimicrobial Resistance Research and Development Hub. Funding comes from both public and private sources, including the Gates Foundation."
+              >
+                <div class="font-semibold">
+                  WHO Launches $100M Initiative Against Drug Resistance
+                </div>
+                <div class="text-sm text-gray-600 mt-1">
+                  Official announcement with verified funding details
+                </div>
+                <div class="comparison-badge">Click to Analyze</div>
+              </div>
+
+              <div
+                class="news-sample real p-4 rounded-lg cursor-pointer relative interactive-panel"
+                data-content="The International Monetary Fund has revised its global economic growth forecast upward to 3.2% for 2024, citing stronger-than-expected performance in emerging markets and developing economies. According to the IMF's World Economic Outlook report, inflation is projected to continue declining in most regions. The report, based on data from 190 member countries, indicates that global trade is recovering faster than anticipated, though geopolitical tensions remain a concern."
+              >
+                <div class="font-semibold">
+                  IMF Revises Global Growth Forecast Upward for 2024
+                </div>
+                <div class="text-sm text-gray-600 mt-1">
+                  Economic report with verifiable data sources
+                </div>
+                <div class="comparison-badge">Click to Analyze</div>
+              </div>
+              <!-- Real News Sample - Add to Real News section -->
+              <div
+                class="news-sample real p-4 rounded-lg cursor-pointer relative interactive-panel"
+                data-content="The European Space Agency's Gaia mission has released the most detailed 3D map of our galaxy ever created, containing precise positions and motions of nearly 2 billion stars. This unprecedented astronomical catalog, compiled over seven years of observations, reveals new insights into the Milky Way's structure and evolution. According to Dr. Anthony Brown of Leiden University, 'This data release represents a huge leap forward in our understanding of the galaxy we call home.' The findings were published in the journal Astronomy & Astrophysics and are freely available to researchers worldwide."
+              >
+                <div class="font-semibold">
+                  ESA's Gaia Mission Releases Most Detailed 3D Map of Milky Way
+                </div>
+                <div class="text-sm text-gray-600 mt-1">
+                  Scientific breakthrough with open data sharing
+                </div>
+                <div class="comparison-badge">Click to Analyze</div>
+              </div>
+
+              <!-- Add these REAL news samples to your Real News section -->
+
+              <div
+                class="news-sample real p-4 rounded-lg cursor-pointer relative interactive-panel"
+                data-content="The World Meteorological Organization has confirmed that 2023 was the hottest year on record, with global temperatures 1.45°C above pre-industrial levels. According to their comprehensive climate report, ocean heat content reached its highest level ever recorded, and Antarctic sea ice hit a record low. The WMO analysis, which synthesizes data from NASA, NOAA, and the European Centre for Medium-Range Weather Forecasts, warns that these trends are accelerating due to continued greenhouse gas emissions. Secretary-General Prof. Petteri Taalas emphasized the urgent need for climate action to mitigate these impacts."
+              >
+                <div class="font-semibold">
+                  WMO Confirms 2023 as Hottest Year on Record
+                </div>
+                <div class="text-sm text-gray-600 mt-1">
+                  Climate data from multiple international agencies
+                </div>
+                <div class="comparison-badge">Click to Analyze</div>
+              </div>
+
+              <div
+                class="news-sample real p-4 rounded-lg cursor-pointer relative interactive-panel"
+                data-content="A landmark study published in the New England Journal of Medicine has demonstrated that a new Alzheimer's drug, lecanemab, can slow cognitive decline by 27% in early-stage patients. The phase 3 clinical trial involved 1,795 participants across 235 sites worldwide and showed significant benefits in memory and daily functioning. Dr. Christopher van Dyck of Yale School of Medicine, the study's lead author, stated: 'This represents a meaningful advancement in our ability to treat this devastating disease.' The FDA has granted accelerated approval based on these results, with full approval pending further review."
+              >
+                <div class="font-semibold">
+                  New Alzheimer's Drug Shows 27% Reduction in Cognitive Decline
+                </div>
+                <div class="text-sm text-gray-600 mt-1">
+                  Peer-reviewed medical research with clinical trial data
+                </div>
+                <div class="comparison-badge">Click to Analyze</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fake News Samples -->
+          <div class="sample-category">
+            <h3 class="text-lg font-bold text-red-600 mb-3 flex items-center">
+              <i class="fas fa-times-circle mr-2"></i> Fake News Samples
+              <span class="ml-2 text-sm font-normal text-gray-500"
+                >(Low Credibility: 15-40%)</span
+              >
+            </h3>
+            <div class="sample-grid">
+              <div
+                class="news-sample fake p-4 rounded-lg cursor-pointer relative interactive-panel"
+                data-content="SHOCKING BREAKING NEWS: Scientists have discovered that drinking bleach cures COVID-19 instantly! A secret government study proves that just one tablespoon of household bleach can eliminate the virus from your system. Doctors are being silenced by Big Pharma who want to keep selling expensive vaccines. This amazing discovery is being hidden from the public to protect pharmaceutical profits. Share this urgent information with everyone you know before it gets deleted!"
+              >
+                <div class="font-semibold">
+                  Bleach Cures COVID-19 Instantly, Doctors Silent
+                </div>
+                <div class="text-sm text-gray-600 mt-1">
+                  Dangerous health misinformation with emotional manipulation
+                </div>
+                <div class="comparison-badge">Click to Analyze</div>
+              </div>
+
+              <div
+                class="news-sample fake p-4 rounded-lg cursor-pointer relative interactive-panel"
+                data-content="URGENT: The government is secretly installing 5G chips in COVID vaccines to track everyone! A whistleblower from Pfizer confirmed that all vaccines contain microscopic tracking devices. These devices connect to 5G towers and allow complete surveillance of your movements and thoughts. This is why they're pushing vaccines so hard - it's not about health, it's about control! Wake up people! Share this everywhere before they delete it!"
+              >
+                <div class="font-semibold">
+                  Vaccines Contain 5G Tracking Chips, Whistleblower Claims
+                </div>
+                <div class="text-sm text-gray-600 mt-1">
+                  Conspiracy theory with sensational claims
+                </div>
+                <div class="comparison-badge">Click to Analyze</div>
+              </div>
+
+              <div
+                class="news-sample fake p-4 rounded-lg cursor-pointer relative interactive-panel"
+                data-content="BREAKING: The Earth is actually FLAT and NASA has been lying to us for decades! A former NASA engineer just came forward with PROOF that all space images are CGI fakes. He revealed that Antarctica is actually a giant ice wall that surrounds our flat world. Governments are hiding this truth to maintain control over the population. Share this explosive revelation before they silence him!"
+              >
+                <div class="font-semibold">
+                  Former NASA Engineer Exposes Flat Earth Conspiracy
+                </div>
+                <div class="text-sm text-gray-600 mt-1">
+                  Debunked conspiracy theory with false claims
+                </div>
+                <div class="comparison-badge">Click to Analyze</div>
+              </div>
+              <!-- Add these samples to your existing sample-grid sections -->
+
+              <!-- Add these FAKE news samples to your Fake News section -->
+
+              <div
+                class="news-sample fake p-4 rounded-lg cursor-pointer relative interactive-panel"
+                data-content="SHOCKING DISCOVERY: All modern fruits and vegetables are GENETICALLY MODIFIED to contain mind-control chemicals! A former Monsanto scientist came forward with proof that supermarket produce has been altered to make consumers passive and obedient. These 'food weapons' are why people aren't protesting against government overreach! Grow your own food or buy only from local organic farms! This information is being suppressed by Big Agriculture! FORWARD TO EVERYONE YOU KNOW!"
+              >
+                <div class="font-semibold">
+                  Supermarket Produce Contains Mind-Control Chemicals
+                </div>
+                <div class="text-sm text-gray-600 mt-1">
+                  Agricultural conspiracy with fear-based claims
+                </div>
+                <div class="comparison-badge">Click to Analyze</div>
+              </div>
+
+              <!-- Fake News Samples - Add to Fake News section -->
+              <div
+                class="news-sample fake p-4 rounded-lg cursor-pointer relative interactive-panel"
+                data-content="EMERGENCY ALERT: The new digital currency will allow governments to CONTROL YOUR MONEY and track every transaction! A leaked document from the World Economic Forum reveals plans to eliminate cash and implement complete financial surveillance by 2025. This is why they're pushing CBDCs - it's not about convenience, it's about TOTAL CONTROL over your finances! Switch to physical gold and silver immediately before they lock down your bank accounts! SHARE THIS WARNING WITH EVERYONE!"
+              >
+                <div class="font-semibold">
+                  Digital Currency Will Allow Total Government Financial Control
+                </div>
+                <div class="text-sm text-gray-600 mt-1">
+                  Financial conspiracy theory with fear-mongering
+                </div>
+                <div class="comparison-badge">Click to Analyze</div>
+              </div>
+
+              <div
+                class="news-sample fake p-4 rounded-lg cursor-pointer relative interactive-panel"
+                data-content="BREAKING: Scientists discover that wearing face masks actually WEAKENS your immune system and makes you MORE vulnerable to diseases! A secret study from Johns Hopkins University proves that prolonged mask use reduces oxygen intake by 60% and causes carbon dioxide poisoning. This is the REAL reason they're pushing masks - to make the population sick and dependent on pharmaceuticals! Throw away your masks now and share this life-saving information before it's censored!"
+              >
+                <div class="font-semibold">
+                  Face Masks Weaken Immune System, Secret Study Reveals
+                </div>
+                <div class="text-sm text-gray-600 mt-1">
+                  Health misinformation with fabricated research
+                </div>
+                <div class="comparison-badge">Click to Analyze</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Comparison -->
+          <div class="bg-blue-50 rounded-xl p-4 mt-6">
+            <h3 class="text-lg font-bold text-blue-700 mb-3 flex items-center">
+              <i class="fas fa-balance-scale mr-2"></i> Quick Comparison
+            </h3>
+            <p class="text-blue-600 mb-3">
+              Click both samples below to see the difference between real and
+              fake news analysis:
+            </p>
+            <div class="grid md:grid-cols-2 gap-4">
+              <div
+                class="news-sample real p-4 rounded-lg cursor-pointer interactive-panel"
+                data-content="A comprehensive study published in The Lancet medical journal has found that regular physical activity can reduce the risk of depression by 25%. The research, which analyzed data from over 1.2 million participants across 15 countries, showed that both moderate and vigorous exercise had significant mental health benefits. The study's lead author, Dr. Maria Rodriguez from University College London, emphasized that these findings highlight the importance of integrating physical activity into mental health treatment plans."
+              >
+                <div class="font-semibold text-green-700">
+                  Study: Exercise Reduces Depression Risk by 25%
+                </div>
+                <div class="text-sm text-gray-600 mt-1">
+                  Large-scale medical research with credible sources
+                </div>
+              </div>
+              <div
+                class="news-sample fake p-4 rounded-lg cursor-pointer interactive-panel"
+                data-content="ALERT: Eating bananas after 6 PM causes instant weight gain and cancer! A hidden study from Harvard Medical School proves that bananas release toxic chemicals when eaten in the evening. This shocking truth is being suppressed by the fruit industry to keep selling their poisonous products. Forward this to everyone you care about - this information could save their lives!"
+              >
+                <div class="font-semibold text-red-700">
+                  Bananas After 6 PM Cause Cancer, Secret Study Reveals
+                </div>
+                <div class="text-sm text-gray-600 mt-1">
+                  False health claim with fabricated study reference
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analysis Section -->
+      <div class="grid lg:grid-cols-3 gap-8 mb-16">
+        <!-- Input Panel -->
+        <div class="lg:col-span-2">
+          <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div
+              class="p-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white"
+            >
+              <h2 class="text-2xl font-bold flex items-center">
+                <i class="fas fa-search mr-3"></i> Content Analysis
+                <span class="pulse-dot ml-2"></span>
+              </h2>
+              <p class="text-blue-100 mt-2">
+                Paste text or click samples to verify authenticity in real-time
+              </p>
+            </div>
+
+            <div class="p-6">
+              <!-- Real-time Analysis Indicator -->
+              <div
+                class="real-time-analysis p-4 rounded-lg mb-6 flex items-center"
+              >
+                <i class="fas fa-bolt text-blue-500 text-xl mr-3"></i>
                 <div>
-                    <h3 class="text-xl font-bold mb-2"><i class="fas fa-graduation-cap mr-2"></i>How to Use This Tool</h3>
-                    <p class="text-blue-100">Click on news samples or paste your own text to analyze credibility. Watch the real-time analysis breakdown!</p>
+                  <div class="font-semibold text-blue-800">
+                    Real-Time Analysis Active
+                  </div>
+                  <div class="text-sm text-blue-600">
+                    Content is analyzed as you type
+                  </div>
                 </div>
-                <button id="close-tutorial" class="text-white hover:text-blue-200">
-                    <i class="fas fa-times"></i>
+              </div>
+
+              <!-- Content Input -->
+              <div class="mb-6">
+                <label class="block text-gray-700 font-medium mb-3"
+                  >Content to Analyze
+                  <span class="text-sm font-normal text-gray-500"
+                    >(Try typing your own text!)</span
+                  ></label
+                >
+                <div class="relative">
+                  <textarea
+                    id="content-input"
+                    class="w-full h-64 p-4 border-2 border-gray-300 rounded-xl resize-none focus:border-blue-400 transition-colors"
+                    placeholder="Paste the content you want to analyze here or start typing..."
+                  ></textarea>
+                  <div class="absolute bottom-4 right-4 text-sm text-gray-500">
+                    <span id="char-count">0</span>/5000 characters
+                  </div>
+                </div>
+              </div>
+
+              <!-- Options -->
+              <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label class="block text-gray-700 font-medium mb-2"
+                    >Content Type</label
+                  >
+                  <select
+                    id="content-type"
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-colors"
+                  >
+                    <option value="news">📰 News Article</option>
+                    <option value="social">💬 Social Media Post</option>
+                    <option value="email">📧 Email/Message</option>
+                    <option value="document">📄 Document</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-gray-700 font-medium mb-2"
+                    >Language</label
+                  >
+                  <select
+                    id="language"
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-colors"
+                  >
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                    <option value="de">German</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Analyze Button -->
+              <button
+                id="analyze-btn"
+                class="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-bold text-lg hover:from-blue-600 hover:to-purple-700 transition-all shadow-lg flex items-center justify-center pulse-animation"
+              >
+                <i class="fas fa-search mr-2"></i> Analyze Content
+              </button>
+
+              <!-- Quick Actions -->
+              <div class="flex space-x-3 mt-4">
+                <button
+                  id="clear-btn"
+                  class="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors flex items-center justify-center"
+                >
+                  <i class="fas fa-eraser mr-2"></i> Clear
                 </button>
+                <button
+                  id="random-btn"
+                  class="flex-1 py-2 bg-green-100 text-green-700 rounded-lg font-medium hover:bg-green-200 transition-colors flex items-center justify-center"
+                >
+                  <i class="fas fa-random mr-2"></i> Random Sample
+                </button>
+              </div>
             </div>
+          </div>
         </div>
 
-        <!-- Stats Bar -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-            <div class="bg-white rounded-xl p-6 shadow-lg text-center card-hover interactive-panel" data-info="Our AI analyzes content across 8 different credibility factors">
-                <div class="text-3xl font-bold text-blue-600 mb-2">8</div>
-                <div class="text-gray-600">Analysis Factors</div>
+        <!-- Results Panel -->
+        <div class="lg:col-span-1">
+          <div class="bg-white rounded-2xl shadow-xl overflow-hidden h-full">
+            <div
+              class="p-6 bg-gradient-to-r from-gray-800 to-gray-900 text-white"
+            >
+              <h2 class="text-2xl font-bold flex items-center">
+                <i class="fas fa-chart-bar mr-3"></i> Analysis Results
+              </h2>
+              <p class="text-gray-300 mt-2">
+                AI-powered assessment of content credibility
+              </p>
             </div>
-            
-            <div class="bg-white rounded-xl p-6 shadow-lg text-center card-hover interactive-panel" data-info="Real-time processing with instant credibility assessment">
-                <div class="text-3xl font-bold text-purple-600 mb-2">
-                    <span class="live-indicator">LIVE</span>
+
+            <div class="p-6">
+              <!-- Initial State -->
+              <div id="initial-state" class="text-center py-12">
+                <div
+                  class="floating inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6"
+                >
+                  <i class="fas fa-shield-alt text-2xl text-blue-500"></i>
                 </div>
-                <div class="text-gray-600">Real-Time Analysis</div>
+                <h3 class="text-xl font-bold text-gray-700 mb-2">
+                  Ready to Analyze
+                </h3>
+                <p class="text-gray-500">
+                  Enter content or click a sample to begin verification
+                </p>
+                <div class="mt-6 text-sm text-gray-400">
+                  <i class="fas fa-lightbulb mr-1"></i> Tip: Try comparing real
+                  vs fake news samples!
+                </div>
+              </div>
+
+              <!-- Loading State -->
+              <div id="loading-state" class="hidden text-center py-12">
+                <div
+                  class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6"
+                >
+                  <i class="fas fa-spinner fa-spin text-2xl text-blue-500"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-700 mb-2">
+                  Analyzing Content
+                </h3>
+                <p class="text-gray-500">This may take a few moments</p>
+                <div class="mt-4">
+                  <div class="flex justify-center space-x-1">
+                    <div
+                      class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                      style="animation-delay: 0ms"
+                    ></div>
+                    <div
+                      class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                      style="animation-delay: 150ms"
+                    ></div>
+                    <div
+                      class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                      style="animation-delay: 300ms"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Results will appear here -->
+              <div id="results-container" class="hidden">
+                <!-- Results content will be dynamically inserted -->
+              </div>
             </div>
-            
-            <div class="bg-white rounded-xl p-6 shadow-lg text-center card-hover interactive-panel" data-info="Compare real vs fake news to learn detection patterns">
-                <div class="text-3xl font-bold text-green-600 mb-2">22</div>
-                <div class="text-gray-600">Test Samples</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Visualization -->
+      <div class="bg-white rounded-2xl shadow-xl p-6 mb-16">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+          <i class="fas fa-chart-pie mr-3 text-purple-500"></i> Credibility
+          Visualization
+        </h2>
+        <p class="text-gray-600 mb-6">
+          Visual representation of how different factors contribute to overall
+          credibility score
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="bg-gray-50 rounded-xl p-6">
+            <h3 class="text-lg font-bold text-gray-700 mb-4">
+              Credibility Factors
+            </h3>
+            <div id="factors-chart" class="space-y-4">
+              <!-- Factors will be dynamically inserted here -->
+              <div class="text-center py-8 text-gray-400">
+                <i class="fas fa-chart-bar text-3xl mb-2"></i>
+                <p>Analyze content to see factor breakdown</p>
+              </div>
             </div>
-            
-            <div class="bg-white rounded-xl p-6 shadow-lg text-center card-hover interactive-panel" data-info="Detailed breakdown of credibility factors with visual indicators">
-                <div class="text-3xl font-bold text-orange-600 mb-2">100%</div>
-                <div class="text-gray-600">Transparent Results</div>
+          </div>
+
+          <div class="bg-gray-50 rounded-xl p-6">
+            <h3 class="text-lg font-bold text-gray-700 mb-4">
+              Detection Patterns
+            </h3>
+            <div id="patterns-chart" class="space-y-4">
+              <!-- Patterns will be dynamically inserted here -->
+              <div class="text-center py-8 text-gray-400">
+                <i class="fas fa-search text-3xl mb-2"></i>
+                <p>Manipulation techniques will appear here</p>
+              </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Features Section -->
+      <div class="mb-16">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-800 mb-4">
+            Interactive Detection Features
+          </h2>
+          <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            Our multi-layered AI analysis detects various forms of
+            misinformation with interactive feedback
+          </p>
         </div>
 
-        <!-- News Samples for Testing -->
-        <div class="bg-white rounded-2xl shadow-xl p-6 mb-8">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-                    <i class="fas fa-vial mr-3 text-blue-500"></i> Interactive Test Samples
-                </h2>
-                <div class="flex items-center space-x-2">
-                    <span class="text-sm text-gray-500">Click to analyze:</span>
-                    <span class="flex items-center text-sm"><span class="w-3 h-3 bg-green-400 rounded-full mr-1"></span> Real</span>
-                    <span class="flex items-center text-sm"><span class="w-3 h-3 bg-red-400 rounded-full mr-1"></span> Fake</span>
-                </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div
+            class="bg-white rounded-xl p-6 shadow-lg card-hover interactive-panel"
+            data-info="Click samples to see real-time credibility assessment"
+          >
+            <div
+              class="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center mb-4"
+            >
+              <i class="fas fa-mouse-pointer text-blue-600 text-xl"></i>
             </div>
-            <p class="text-gray-600 mb-6">Click on any sample below to test the analyzer. Watch how real and fake news produce different credibility scores!</p>
-            
-            <div class="space-y-6">
-                <!-- Real News Samples -->
-                <div class="sample-category">
-                    <h3 class="text-lg font-bold text-green-600 mb-3 flex items-center">
-                        <i class="fas fa-check-circle mr-2"></i> Real News Samples 
-                        <span class="ml-2 text-sm font-normal text-gray-500">(High Credibility: 80-95%)</span>
-                    </h3>
-                    <div class="sample-grid">
-                        <div class="news-sample real p-4 rounded-lg cursor-pointer relative interactive-panel" data-content="NASA's James Webb Space Telescope has captured stunning new images of the Orion Nebula, revealing previously unseen details of star formation. The images show intricate structures within the nebula, including protoplanetary disks and young stellar objects. Scientists from the European Space Agency collaborated on this research, which was published in the peer-reviewed journal Nature Astronomy. The findings provide new insights into the early stages of star and planet formation.">
-                            <div class="font-semibold">Webb Telescope Reveals New Star Formation Details</div>
-                            <div class="text-sm text-gray-600 mt-1">Credible scientific discovery with peer-reviewed sources</div>
-                            <div class="comparison-badge">Click to Analyze</div>
-                        </div>
-                        
-                        <div class="news-sample real p-4 rounded-lg cursor-pointer relative interactive-panel" data-content="The World Health Organization has announced a new global initiative to combat antimicrobial resistance. The program will invest $100 million over five years to develop new antibiotics and improve surveillance systems. Dr. Tedros Adhanom Ghebreyesus stated: 'This is a critical step in protecting our most essential medicines.' The initiative involves collaboration with 15 countries and follows recommendations from the Global Antimicrobial Resistance Research and Development Hub. Funding comes from both public and private sources, including the Gates Foundation.">
-                            <div class="font-semibold">WHO Launches $100M Initiative Against Drug Resistance</div>
-                            <div class="text-sm text-gray-600 mt-1">Official announcement with verified funding details</div>
-                            <div class="comparison-badge">Click to Analyze</div>
-                        </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">
+              Click to Analyze
+            </h3>
+            <p class="text-gray-600">
+              Interactive samples with instant credibility scoring
+            </p>
+          </div>
 
-                        <div class="news-sample real p-4 rounded-lg cursor-pointer relative interactive-panel" data-content="The International Monetary Fund has revised its global economic growth forecast upward to 3.2% for 2024, citing stronger-than-expected performance in emerging markets and developing economies. According to the IMF's World Economic Outlook report, inflation is projected to continue declining in most regions. The report, based on data from 190 member countries, indicates that global trade is recovering faster than anticipated, though geopolitical tensions remain a concern.">
-                            <div class="font-semibold">IMF Revises Global Growth Forecast Upward for 2024</div>
-                            <div class="text-sm text-gray-600 mt-1">Economic report with verifiable data sources</div>
-                            <div class="comparison-badge">Click to Analyze</div>
-                        </div>
-                        <!-- Real News Sample - Add to Real News section -->
-<div class="news-sample real p-4 rounded-lg cursor-pointer relative interactive-panel" data-content="The European Space Agency's Gaia mission has released the most detailed 3D map of our galaxy ever created, containing precise positions and motions of nearly 2 billion stars. This unprecedented astronomical catalog, compiled over seven years of observations, reveals new insights into the Milky Way's structure and evolution. According to Dr. Anthony Brown of Leiden University, 'This data release represents a huge leap forward in our understanding of the galaxy we call home.' The findings were published in the journal Astronomy & Astrophysics and are freely available to researchers worldwide.">
-    <div class="font-semibold">ESA's Gaia Mission Releases Most Detailed 3D Map of Milky Way</div>
-    <div class="text-sm text-gray-600 mt-1">Scientific breakthrough with open data sharing</div>
-    <div class="comparison-badge">Click to Analyze</div>
-</div>
-                    </div>
-                </div>
-                
-                <!-- Fake News Samples -->
-                <div class="sample-category">
-                    <h3 class="text-lg font-bold text-red-600 mb-3 flex items-center">
-                        <i class="fas fa-times-circle mr-2"></i> Fake News Samples 
-                        <span class="ml-2 text-sm font-normal text-gray-500">(Low Credibility: 15-40%)</span>
-                    </h3>
-                    <div class="sample-grid">
-                        <div class="news-sample fake p-4 rounded-lg cursor-pointer relative interactive-panel" data-content="SHOCKING BREAKING NEWS: Scientists have discovered that drinking bleach cures COVID-19 instantly! A secret government study proves that just one tablespoon of household bleach can eliminate the virus from your system. Doctors are being silenced by Big Pharma who want to keep selling expensive vaccines. This amazing discovery is being hidden from the public to protect pharmaceutical profits. Share this urgent information with everyone you know before it gets deleted!">
-                            <div class="font-semibold">Bleach Cures COVID-19 Instantly, Doctors Silent</div>
-                            <div class="text-sm text-gray-600 mt-1">Dangerous health misinformation with emotional manipulation</div>
-                            <div class="comparison-badge">Click to Analyze</div>
-                        </div>
-                        
-                        <div class="news-sample fake p-4 rounded-lg cursor-pointer relative interactive-panel" data-content="URGENT: The government is secretly installing 5G chips in COVID vaccines to track everyone! A whistleblower from Pfizer confirmed that all vaccines contain microscopic tracking devices. These devices connect to 5G towers and allow complete surveillance of your movements and thoughts. This is why they're pushing vaccines so hard - it's not about health, it's about control! Wake up people! Share this everywhere before they delete it!">
-                            <div class="font-semibold">Vaccines Contain 5G Tracking Chips, Whistleblower Claims</div>
-                            <div class="text-sm text-gray-600 mt-1">Conspiracy theory with sensational claims</div>
-                            <div class="comparison-badge">Click to Analyze</div>
-                        </div>
-
-                        <div class="news-sample fake p-4 rounded-lg cursor-pointer relative interactive-panel" data-content="BREAKING: The Earth is actually FLAT and NASA has been lying to us for decades! A former NASA engineer just came forward with PROOF that all space images are CGI fakes. He revealed that Antarctica is actually a giant ice wall that surrounds our flat world. Governments are hiding this truth to maintain control over the population. Share this explosive revelation before they silence him!">
-                            <div class="font-semibold">Former NASA Engineer Exposes Flat Earth Conspiracy</div>
-                            <div class="text-sm text-gray-600 mt-1">Debunked conspiracy theory with false claims</div>
-                            <div class="comparison-badge">Click to Analyze</div>
-                        </div>
-                        <!-- Add these samples to your existing sample-grid sections -->
-
-
-
-<!-- Fake News Samples - Add to Fake News section -->
-<div class="news-sample fake p-4 rounded-lg cursor-pointer relative interactive-panel" data-content="EMERGENCY ALERT: The new digital currency will allow governments to CONTROL YOUR MONEY and track every transaction! A leaked document from the World Economic Forum reveals plans to eliminate cash and implement complete financial surveillance by 2025. This is why they're pushing CBDCs - it's not about convenience, it's about TOTAL CONTROL over your finances! Switch to physical gold and silver immediately before they lock down your bank accounts! SHARE THIS WARNING WITH EVERYONE!">
-    <div class="font-semibold">Digital Currency Will Allow Total Government Financial Control</div>
-    <div class="text-sm text-gray-600 mt-1">Financial conspiracy theory with fear-mongering</div>
-    <div class="comparison-badge">Click to Analyze</div>
-</div>
-
-<div class="news-sample fake p-4 rounded-lg cursor-pointer relative interactive-panel" data-content="BREAKING: Scientists discover that wearing face masks actually WEAKENS your immune system and makes you MORE vulnerable to diseases! A secret study from Johns Hopkins University proves that prolonged mask use reduces oxygen intake by 60% and causes carbon dioxide poisoning. This is the REAL reason they're pushing masks - to make the population sick and dependent on pharmaceuticals! Throw away your masks now and share this life-saving information before it's censored!">
-    <div class="font-semibold">Face Masks Weaken Immune System, Secret Study Reveals</div>
-    <div class="text-sm text-gray-600 mt-1">Health misinformation with fabricated research</div>
-    <div class="comparison-badge">Click to Analyze</div>
-</div>
-                    </div>
-                </div>
-
-                <!-- Quick Comparison -->
-                <div class="bg-blue-50 rounded-xl p-4 mt-6">
-                    <h3 class="text-lg font-bold text-blue-700 mb-3 flex items-center">
-                        <i class="fas fa-balance-scale mr-2"></i> Quick Comparison
-                    </h3>
-                    <p class="text-blue-600 mb-3">Click both samples below to see the difference between real and fake news analysis:</p>
-                    <div class="grid md:grid-cols-2 gap-4">
-                        <div class="news-sample real p-4 rounded-lg cursor-pointer interactive-panel" data-content="A comprehensive study published in The Lancet medical journal has found that regular physical activity can reduce the risk of depression by 25%. The research, which analyzed data from over 1.2 million participants across 15 countries, showed that both moderate and vigorous exercise had significant mental health benefits. The study's lead author, Dr. Maria Rodriguez from University College London, emphasized that these findings highlight the importance of integrating physical activity into mental health treatment plans.">
-                            <div class="font-semibold text-green-700">Study: Exercise Reduces Depression Risk by 25%</div>
-                            <div class="text-sm text-gray-600 mt-1">Large-scale medical research with credible sources</div>
-                        </div>
-                        <div class="news-sample fake p-4 rounded-lg cursor-pointer interactive-panel" data-content="ALERT: Eating bananas after 6 PM causes instant weight gain and cancer! A hidden study from Harvard Medical School proves that bananas release toxic chemicals when eaten in the evening. This shocking truth is being suppressed by the fruit industry to keep selling their poisonous products. Forward this to everyone you care about - this information could save their lives!">
-                            <div class="font-semibold text-red-700">Bananas After 6 PM Cause Cancer, Secret Study Reveals</div>
-                            <div class="text-sm text-gray-600 mt-1">False health claim with fabricated study reference</div>
-                        </div>
-                    </div>
-                </div>
+          <div
+            class="bg-white rounded-xl p-6 shadow-lg card-hover interactive-panel"
+            data-info="Watch the score change as different factors are evaluated"
+          >
+            <div
+              class="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center mb-4"
+            >
+              <i class="fas fa-tachometer-alt text-purple-600 text-xl"></i>
             </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">
+              Real-Time Scoring
+            </h3>
+            <p class="text-gray-600">
+              Dynamic credibility assessment with visual feedback
+            </p>
+          </div>
+
+          <div
+            class="bg-white rounded-xl p-6 shadow-lg card-hover interactive-panel"
+            data-info="Compare real vs fake news to learn detection patterns"
+          >
+            <div
+              class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center mb-4"
+            >
+              <i class="fas fa-balance-scale text-green-600 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">
+              Side-by-Side Comparison
+            </h3>
+            <p class="text-gray-600">
+              Learn to distinguish credible from misleading content
+            </p>
+          </div>
+
+          <div
+            class="bg-white rounded-xl p-6 shadow-lg card-hover interactive-panel"
+            data-info="Detailed breakdown of each credibility factor"
+          >
+            <div
+              class="w-12 h-12 rounded-lg bg-red-100 flex items-center justify-center mb-4"
+            >
+              <i class="fas fa-chart-bar text-red-600 text-xl"></i>
+            </div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">
+              Visual Analytics
+            </h3>
+            <p class="text-gray-600">
+              Interactive charts showing credibility factors
+            </p>
+          </div>
         </div>
-
-        <!-- Analysis Section -->
-        <div class="grid lg:grid-cols-3 gap-8 mb-16">
-            <!-- Input Panel -->
-            <div class="lg:col-span-2">
-                <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-                    <div class="p-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-                        <h2 class="text-2xl font-bold flex items-center">
-                            <i class="fas fa-search mr-3"></i> Content Analysis
-                            <span class="pulse-dot ml-2"></span>
-                        </h2>
-                        <p class="text-blue-100 mt-2">Paste text or click samples to verify authenticity in real-time</p>
-                    </div>
-                    
-                    <div class="p-6">
-                        <!-- Real-time Analysis Indicator -->
-                        <div class="real-time-analysis p-4 rounded-lg mb-6 flex items-center">
-                            <i class="fas fa-bolt text-blue-500 text-xl mr-3"></i>
-                            <div>
-                                <div class="font-semibold text-blue-800">Real-Time Analysis Active</div>
-                                <div class="text-sm text-blue-600">Content is analyzed as you type</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Content Input -->
-                        <div class="mb-6">
-                            <label class="block text-gray-700 font-medium mb-3">Content to Analyze <span class="text-sm font-normal text-gray-500">(Try typing your own text!)</span></label>
-                            <div class="relative">
-                                <textarea 
-                                    id="content-input"
-                                    class="w-full h-64 p-4 border-2 border-gray-300 rounded-xl resize-none focus:border-blue-400 transition-colors" 
-                                    placeholder="Paste the content you want to analyze here or start typing..."></textarea>
-                                <div class="absolute bottom-4 right-4 text-sm text-gray-500"><span id="char-count">0</span>/5000 characters</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Options -->
-                        <div class="grid md:grid-cols-2 gap-6 mb-6">
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-2">Content Type</label>
-                                <select id="content-type" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-colors">
-                                    <option value="news">📰 News Article</option>
-                                    <option value="social">💬 Social Media Post</option>
-                                    <option value="email">📧 Email/Message</option>
-                                    <option value="document">📄 Document</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-2">Language</label>
-                                <select id="language" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-400 transition-colors">
-                                    <option value="en">English</option>
-                                    <option value="hi">Hindi</option>
-                                    <option value="es">Spanish</option>
-                                    <option value="fr">French</option>
-                                    <option value="de">German</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <!-- Analyze Button -->
-                        <button id="analyze-btn" class="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl font-bold text-lg hover:from-blue-600 hover:to-purple-700 transition-all shadow-lg flex items-center justify-center pulse-animation">
-                            <i class="fas fa-search mr-2"></i> Analyze Content
-                        </button>
-
-                        <!-- Quick Actions -->
-                        <div class="flex space-x-3 mt-4">
-                            <button id="clear-btn" class="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors flex items-center justify-center">
-                                <i class="fas fa-eraser mr-2"></i> Clear
-                            </button>
-                            <button id="random-btn" class="flex-1 py-2 bg-green-100 text-green-700 rounded-lg font-medium hover:bg-green-200 transition-colors flex items-center justify-center">
-                                <i class="fas fa-random mr-2"></i> Random Sample
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Results Panel -->
-            <div class="lg:col-span-1">
-                <div class="bg-white rounded-2xl shadow-xl overflow-hidden h-full">
-                    <div class="p-6 bg-gradient-to-r from-gray-800 to-gray-900 text-white">
-                        <h2 class="text-2xl font-bold flex items-center">
-                            <i class="fas fa-chart-bar mr-3"></i> Analysis Results
-                        </h2>
-                        <p class="text-gray-300 mt-2">AI-powered assessment of content credibility</p>
-                    </div>
-                    
-                    <div class="p-6">
-                        <!-- Initial State -->
-                        <div id="initial-state" class="text-center py-12">
-                            <div class="floating inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6">
-                                <i class="fas fa-shield-alt text-2xl text-blue-500"></i>
-                            </div>
-                            <h3 class="text-xl font-bold text-gray-700 mb-2">Ready to Analyze</h3>
-                            <p class="text-gray-500">Enter content or click a sample to begin verification</p>
-                            <div class="mt-6 text-sm text-gray-400">
-                                <i class="fas fa-lightbulb mr-1"></i> Tip: Try comparing real vs fake news samples!
-                            </div>
-                        </div>
-                        
-                        <!-- Loading State -->
-                        <div id="loading-state" class="hidden text-center py-12">
-                            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-100 to-purple-100 mb-6">
-                                <i class="fas fa-spinner fa-spin text-2xl text-blue-500"></i>
-                            </div>
-                            <h3 class="text-xl font-bold text-gray-700 mb-2">Analyzing Content</h3>
-                            <p class="text-gray-500">This may take a few moments</p>
-                            <div class="mt-4">
-                                <div class="flex justify-center space-x-1">
-                                    <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
-                                    <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
-                                    <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Results will appear here -->
-                        <div id="results-container" class="hidden">
-                            <!-- Results content will be dynamically inserted -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Interactive Visualization -->
-        <div class="bg-white rounded-2xl shadow-xl p-6 mb-16">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                <i class="fas fa-chart-pie mr-3 text-purple-500"></i> Credibility Visualization
-            </h2>
-            <p class="text-gray-600 mb-6">Visual representation of how different factors contribute to overall credibility score</p>
-            
-            <div class="grid md:grid-cols-2 gap-8">
-                <div class="bg-gray-50 rounded-xl p-6">
-                    <h3 class="text-lg font-bold text-gray-700 mb-4">Credibility Factors</h3>
-                    <div id="factors-chart" class="space-y-4">
-                        <!-- Factors will be dynamically inserted here -->
-                        <div class="text-center py-8 text-gray-400">
-                            <i class="fas fa-chart-bar text-3xl mb-2"></i>
-                            <p>Analyze content to see factor breakdown</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="bg-gray-50 rounded-xl p-6">
-                    <h3 class="text-lg font-bold text-gray-700 mb-4">Detection Patterns</h3>
-                    <div id="patterns-chart" class="space-y-4">
-                        <!-- Patterns will be dynamically inserted here -->
-                        <div class="text-center py-8 text-gray-400">
-                            <i class="fas fa-search text-3xl mb-2"></i>
-                            <p>Manipulation techniques will appear here</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Features Section -->
-        <div class="mb-16">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-800 mb-4">Interactive Detection Features</h2>
-                <p class="text-xl text-gray-600 max-w-3xl mx-auto">Our multi-layered AI analysis detects various forms of misinformation with interactive feedback</p>
-            </div>
-            
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="bg-white rounded-xl p-6 shadow-lg card-hover interactive-panel" data-info="Click samples to see real-time credibility assessment">
-                    <div class="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center mb-4">
-                        <i class="fas fa-mouse-pointer text-blue-600 text-xl"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-800 mb-2">Click to Analyze</h3>
-                    <p class="text-gray-600">Interactive samples with instant credibility scoring</p>
-                </div>
-                
-                <div class="bg-white rounded-xl p-6 shadow-lg card-hover interactive-panel" data-info="Watch the score change as different factors are evaluated">
-                    <div class="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center mb-4">
-                        <i class="fas fa-tachometer-alt text-purple-600 text-xl"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-800 mb-2">Real-Time Scoring</h3>
-                    <p class="text-gray-600">Dynamic credibility assessment with visual feedback</p>
-                </div>
-                
-                <div class="bg-white rounded-xl p-6 shadow-lg card-hover interactive-panel" data-info="Compare real vs fake news to learn detection patterns">
-                    <div class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center mb-4">
-                        <i class="fas fa-balance-scale text-green-600 text-xl"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-800 mb-2">Side-by-Side Comparison</h3>
-                    <p class="text-gray-600">Learn to distinguish credible from misleading content</p>
-                </div>
-                
-                <div class="bg-white rounded-xl p-6 shadow-lg card-hover interactive-panel" data-info="Detailed breakdown of each credibility factor">
-                    <div class="w-12 h-12 rounded-lg bg-red-100 flex items-center justify-center mb-4">
-                        <i class="fas fa-chart-bar text-red-600 text-xl"></i>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-800 mb-2">Visual Analytics</h3>
-                    <p class="text-gray-600">Interactive charts showing credibility factors</p>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
 
     <script>
-        // Enhanced interactive functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize tooltips for interactive elements
-            const initTooltips = () => {
-                document.querySelectorAll('.interactive-panel').forEach(panel => {
-                    const info = panel.getAttribute('data-info');
-                    if (info) {
-                        panel.addEventListener('mouseenter', function(e) {
-                            // Create tooltip
-                            const tooltip = document.createElement('div');
-                            tooltip.className = 'absolute z-10 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm tooltip';
-                            tooltip.textContent = info;
-                            document.body.appendChild(tooltip);
-                            
-                            // Position tooltip
-                            const rect = panel.getBoundingClientRect();
-                            tooltip.style.left = `${rect.left + window.scrollX}px`;
-                            tooltip.style.top = `${rect.top + window.scrollY - tooltip.offsetHeight - 10}px`;
-                            
-                            panel.tooltip = tooltip;
-                        });
-                        
-                        panel.addEventListener('mouseleave', function() {
-                            if (panel.tooltip) {
-                                panel.tooltip.remove();
-                                panel.tooltip = null;
-                            }
-                        });
-                    }
-                });
-            };
-            
-            // Initialize the application
-            initTooltips();
-            
-            // Tab functionality
-            const tabs = document.querySelectorAll('.flex.space-x-1 button');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    tabs.forEach(t => t.classList.remove('tab-active', 'text-white'));
-                    tabs.forEach(t => t.classList.add('text-gray-600', 'hover:text-gray-900'));
-                    this.classList.add('tab-active', 'text-white');
-                    this.classList.remove('text-gray-600', 'hover:text-gray-900');
-                });
-            });
-            
-            // Character counter for textarea
-            const textarea = document.getElementById('content-input');
-            const charCounter = document.getElementById('char-count');
-            
-            textarea.addEventListener('input', function() {
-                const count = this.value.length;
-                charCounter.textContent = count;
-                
-                if (count > 4500) {
-                    charCounter.classList.add('text-red-500');
-                } else {
-                    charCounter.classList.remove('text-red-500');
+      // Enhanced interactive functionality
+      document.addEventListener("DOMContentLoaded", function () {
+        // Initialize tooltips for interactive elements
+        const initTooltips = () => {
+          document.querySelectorAll(".interactive-panel").forEach((panel) => {
+            const info = panel.getAttribute("data-info");
+            if (info) {
+              panel.addEventListener("mouseenter", function (e) {
+                // Create tooltip
+                const tooltip = document.createElement("div");
+                tooltip.className =
+                  "absolute z-10 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm tooltip";
+                tooltip.textContent = info;
+                document.body.appendChild(tooltip);
+
+                // Position tooltip
+                const rect = panel.getBoundingClientRect();
+                tooltip.style.left = `${rect.left + window.scrollX}px`;
+                tooltip.style.top = `${
+                  rect.top + window.scrollY - tooltip.offsetHeight - 10
+                }px`;
+
+                panel.tooltip = tooltip;
+              });
+
+              panel.addEventListener("mouseleave", function () {
+                if (panel.tooltip) {
+                  panel.tooltip.remove();
+                  panel.tooltip = null;
                 }
-                
-                // Real-time analysis for longer content
-                if (count > 100) {
-                    // Show "analyzing" indicator
-                    const realTimePanel = document.querySelector('.real-time-analysis');
-                    realTimePanel.innerHTML = `
+              });
+            }
+          });
+        };
+
+        // Initialize the application
+        initTooltips();
+
+        // Tab functionality
+        const tabs = document.querySelectorAll(".flex.space-x-1 button");
+        tabs.forEach((tab) => {
+          tab.addEventListener("click", function () {
+            tabs.forEach((t) => t.classList.remove("tab-active", "text-white"));
+            tabs.forEach((t) =>
+              t.classList.add("text-gray-600", "hover:text-gray-900")
+            );
+            this.classList.add("tab-active", "text-white");
+            this.classList.remove("text-gray-600", "hover:text-gray-900");
+          });
+        });
+
+        // Character counter for textarea
+        const textarea = document.getElementById("content-input");
+        const charCounter = document.getElementById("char-count");
+
+        textarea.addEventListener("input", function () {
+          const count = this.value.length;
+          charCounter.textContent = count;
+
+          if (count > 4500) {
+            charCounter.classList.add("text-red-500");
+          } else {
+            charCounter.classList.remove("text-red-500");
+          }
+
+          // Real-time analysis for longer content
+          if (count > 100) {
+            // Show "analyzing" indicator
+            const realTimePanel = document.querySelector(".real-time-analysis");
+            realTimePanel.innerHTML = `
                         <i class="fas fa-bolt text-blue-500 text-xl mr-3"></i>
                         <div>
                             <div class="font-semibold text-blue-800">Analyzing Content...</div>
                             <div class="text-sm text-blue-600">Real-time assessment in progress</div>
                         </div>
                     `;
-                    
-                    // Simulate real-time analysis after a delay
-                    clearTimeout(window.realTimeTimeout);
-                    window.realTimeTimeout = setTimeout(() => {
-                        if (count > 100) {
-                            const analysis = analyzeContent(this.value, 'news', 'en');
-                            updateVisualization(analysis);
-                        }
-                    }, 1000);
-                }
-            });
-            
-            // News sample click handlers with animation
-            document.querySelectorAll('.news-sample').forEach(sample => {
-                sample.addEventListener('click', function() {
-                    // Add click animation
-                    this.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        this.style.transform = '';
-                    }, 150);
-                    
-                    const content = this.getAttribute('data-content');
-                    textarea.value = content;
-                    charCounter.textContent = content.length;
-                    
-                    // Trigger analysis
-                    analyzeContentHandler();
-                });
-            });
-            
-            // Clear button
-            document.getElementById('clear-btn').addEventListener('click', function() {
-                textarea.value = '';
-                charCounter.textContent = '0';
-                document.getElementById('initial-state').classList.remove('hidden');
-                document.getElementById('loading-state').classList.add('hidden');
-                document.getElementById('results-container').classList.add('hidden');
-                resetVisualization();
-            });
-            
-            // Random sample button
-            document.getElementById('random-btn').addEventListener('click', function() {
-                const samples = document.querySelectorAll('.news-sample');
-                const randomSample = samples[Math.floor(Math.random() * samples.length)];
-                randomSample.click();
-                
-                // Add button animation
-                this.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    this.style.transform = '';
-                }, 150);
-            });
-            
-            // Demo button
-            document.getElementById('demo-btn').addEventListener('click', function() {
-                // Cycle through a few samples to demonstrate
-                const demoContents = [
-                    "NASA's James Webb Space Telescope has captured stunning new images of the Orion Nebula, revealing previously unseen details of star formation.",
-                    "SHOCKING BREAKING NEWS: Scientists have discovered that drinking bleach cures COVID-19 instantly!",
-                    "The World Health Organization has announced a new global initiative to combat antimicrobial resistance."
-                ];
-                
-                let index = 0;
-                const demoInterval = setInterval(() => {
-                    textarea.value = demoContents[index];
-                    charCounter.textContent = demoContents[index].length;
-                    analyzeContentHandler();
-                    
-                    index++;
-                    if (index >= demoContents.length) {
-                        clearInterval(demoInterval);
-                    }
-                }, 3000);
-            });
-            
-            // Tutorial button
-            document.getElementById('tutorial-btn').addEventListener('click', function() {
-                document.getElementById('tutorial-panel').classList.remove('hidden');
-            });
-            
-            document.getElementById('close-tutorial').addEventListener('click', function() {
-                document.getElementById('tutorial-panel').classList.add('hidden');
-            });
-            
-            // Analyze button functionality
-            const analyzeBtn = document.getElementById('analyze-btn');
-            const resultsContainer = document.getElementById('results-container');
-            const initialState = document.getElementById('initial-state');
-            const loadingState = document.getElementById('loading-state');
-            
-            function analyzeContentHandler() {
-                const text = textarea.value.trim();
-                if (text.length < 10) {
-                    alert('Please enter at least 10 characters to analyze.');
-                    return;
-                }
-                
-                // Show loading state with animation
-                initialState.classList.add('hidden');
-                loadingState.classList.remove('hidden');
-                resultsContainer.classList.add('hidden');
-                
-                // Disable button during analysis
-                analyzeBtn.disabled = true;
-                analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Analyzing...';
-                
-                // Get analysis parameters
-                const contentType = document.getElementById('content-type').value;
-                const language = document.getElementById('language').value;
-                
-                // Perform analysis (with slight delay to simulate processing)
-                setTimeout(() => {
-                    const analysis = analyzeContent(text, contentType, language);
-                    displayResults(analysis);
-                    updateVisualization(analysis);
-                    
-                    // Show results and hide loading state
-                    loadingState.classList.add('hidden');
-                    resultsContainer.classList.remove('hidden');
-                    
-                    // Reset button
-                    analyzeBtn.innerHTML = '<i class="fas fa-search mr-2"></i> Analyze Content';
-                    analyzeBtn.disabled = false;
-                }, 2000);
-            }
-            
-            analyzeBtn.addEventListener('click', analyzeContentHandler);
-            
-            // Enhanced results display with animations
-            function displayResults(analysis) {
-                // Determine credibility level
-                let credibilityClass, credibilityText, progressClass;
-                if (analysis.credibilityScore >= 80) {
-                    credibilityClass = 'text-green-600';
-                    credibilityText = 'Highly Credible';
-                    progressClass = 'credibility-high';
-                } else if (analysis.credibilityScore >= 60) {
-                    credibilityClass = 'text-yellow-600';
-                    credibilityText = 'Moderately Credible';
-                    progressClass = 'credibility-medium';
-                } else if (analysis.credibilityScore >= 40) {
-                    credibilityClass = 'text-orange-600';
-                    credibilityText = 'Questionable';
-                    progressClass = 'credibility-medium';
-                } else {
-                    credibilityClass = 'text-red-600';
-                    credibilityText = 'Likely Misinformation';
-                    progressClass = 'credibility-low';
-                }
-                
-                // Generate analysis criteria HTML with visual bars
-                const criteriaHTML = analysis.analysisDetails.map(detail => {
-                    let scoreClass = '';
-                    let barWidth = '100%';
-                    let barColor = '#10b981';
-                    
-                    if (detail.score === 'High') {
-                        scoreClass = 'score-high';
-                        barWidth = '90%';
-                        barColor = '#10b981';
-                    } else if (detail.score === 'Medium') {
-                        scoreClass = 'score-medium';
-                        barWidth = '60%';
-                        barColor = '#f59e0b';
-                    } else if (detail.score === 'Low') {
-                        scoreClass = 'score-low';
-                        barWidth = '30%';
-                        barColor = '#ef4444';
-                    }
-                    
-                    return `
+
+            // Simulate real-time analysis after a delay
+            clearTimeout(window.realTimeTimeout);
+            window.realTimeTimeout = setTimeout(() => {
+              if (count > 100) {
+                const analysis = analyzeContent(this.value, "news", "en");
+                updateVisualization(analysis);
+              }
+            }, 1000);
+          }
+        });
+
+        // News sample click handlers with animation
+        document.querySelectorAll(".news-sample").forEach((sample) => {
+          sample.addEventListener("click", function () {
+            // Add click animation
+            this.style.transform = "scale(0.95)";
+            setTimeout(() => {
+              this.style.transform = "";
+            }, 150);
+
+            const content = this.getAttribute("data-content");
+            textarea.value = content;
+            charCounter.textContent = content.length;
+
+            // Trigger analysis
+            analyzeContentHandler();
+          });
+        });
+
+        // Clear button
+        document
+          .getElementById("clear-btn")
+          .addEventListener("click", function () {
+            textarea.value = "";
+            charCounter.textContent = "0";
+            document.getElementById("initial-state").classList.remove("hidden");
+            document.getElementById("loading-state").classList.add("hidden");
+            document
+              .getElementById("results-container")
+              .classList.add("hidden");
+            resetVisualization();
+          });
+
+        // Random sample button
+        document
+          .getElementById("random-btn")
+          .addEventListener("click", function () {
+            const samples = document.querySelectorAll(".news-sample");
+            const randomSample =
+              samples[Math.floor(Math.random() * samples.length)];
+            randomSample.click();
+
+            // Add button animation
+            this.style.transform = "scale(0.95)";
+            setTimeout(() => {
+              this.style.transform = "";
+            }, 150);
+          });
+
+        // Demo button
+        document
+          .getElementById("demo-btn")
+          .addEventListener("click", function () {
+            // Cycle through a few samples to demonstrate
+            const demoContents = [
+              "NASA's James Webb Space Telescope has captured stunning new images of the Orion Nebula, revealing previously unseen details of star formation.",
+              "SHOCKING BREAKING NEWS: Scientists have discovered that drinking bleach cures COVID-19 instantly!",
+              "The World Health Organization has announced a new global initiative to combat antimicrobial resistance.",
+            ];
+
+            let index = 0;
+            const demoInterval = setInterval(() => {
+              textarea.value = demoContents[index];
+              charCounter.textContent = demoContents[index].length;
+              analyzeContentHandler();
+
+              index++;
+              if (index >= demoContents.length) {
+                clearInterval(demoInterval);
+              }
+            }, 3000);
+          });
+
+        // Tutorial button
+        document
+          .getElementById("tutorial-btn")
+          .addEventListener("click", function () {
+            document
+              .getElementById("tutorial-panel")
+              .classList.remove("hidden");
+          });
+
+        document
+          .getElementById("close-tutorial")
+          .addEventListener("click", function () {
+            document.getElementById("tutorial-panel").classList.add("hidden");
+          });
+
+        // Analyze button functionality
+        const analyzeBtn = document.getElementById("analyze-btn");
+        const resultsContainer = document.getElementById("results-container");
+        const initialState = document.getElementById("initial-state");
+        const loadingState = document.getElementById("loading-state");
+
+        function analyzeContentHandler() {
+          const text = textarea.value.trim();
+          if (text.length < 10) {
+            alert("Please enter at least 10 characters to analyze.");
+            return;
+          }
+
+          // Show loading state with animation
+          initialState.classList.add("hidden");
+          loadingState.classList.remove("hidden");
+          resultsContainer.classList.add("hidden");
+
+          // Disable button during analysis
+          analyzeBtn.disabled = true;
+          analyzeBtn.innerHTML =
+            '<i class="fas fa-spinner fa-spin mr-2"></i> Analyzing...';
+
+          // Get analysis parameters
+          const contentType = document.getElementById("content-type").value;
+          const language = document.getElementById("language").value;
+
+          // Perform analysis (with slight delay to simulate processing)
+          setTimeout(() => {
+            const analysis = analyzeContent(text, contentType, language);
+            displayResults(analysis);
+            updateVisualization(analysis);
+
+            // Show results and hide loading state
+            loadingState.classList.add("hidden");
+            resultsContainer.classList.remove("hidden");
+
+            // Reset button
+            analyzeBtn.innerHTML =
+              '<i class="fas fa-search mr-2"></i> Analyze Content';
+            analyzeBtn.disabled = false;
+          }, 2000);
+        }
+
+        analyzeBtn.addEventListener("click", analyzeContentHandler);
+
+        // Enhanced results display with animations
+        function displayResults(analysis) {
+          // Determine credibility level
+          let credibilityClass, credibilityText, progressClass;
+          if (analysis.credibilityScore >= 80) {
+            credibilityClass = "text-green-600";
+            credibilityText = "Highly Credible";
+            progressClass = "credibility-high";
+          } else if (analysis.credibilityScore >= 60) {
+            credibilityClass = "text-yellow-600";
+            credibilityText = "Moderately Credible";
+            progressClass = "credibility-medium";
+          } else if (analysis.credibilityScore >= 40) {
+            credibilityClass = "text-orange-600";
+            credibilityText = "Questionable";
+            progressClass = "credibility-medium";
+          } else {
+            credibilityClass = "text-red-600";
+            credibilityText = "Likely Misinformation";
+            progressClass = "credibility-low";
+          }
+
+          // Generate analysis criteria HTML with visual bars
+          const criteriaHTML = analysis.analysisDetails
+            .map((detail) => {
+              let scoreClass = "";
+              let barWidth = "100%";
+              let barColor = "#10b981";
+
+              if (detail.score === "High") {
+                scoreClass = "score-high";
+                barWidth = "90%";
+                barColor = "#10b981";
+              } else if (detail.score === "Medium") {
+                scoreClass = "score-medium";
+                barWidth = "60%";
+                barColor = "#f59e0b";
+              } else if (detail.score === "Low") {
+                scoreClass = "score-low";
+                barWidth = "30%";
+                barColor = "#ef4444";
+              }
+
+              return `
                         <div class="criteria-item">
                             <span>${detail.criteria}</span>
                             <span class="criteria-score ${scoreClass}">${detail.score}</span>
@@ -925,36 +1297,51 @@
                             </div>
                         </div>
                     `;
-                }).join('');
-                
-                // Generate fact-check HTML
-                let factCheckHTML = '';
-                if (analysis.factChecks.length > 0) {
-                    const factCheckItems = analysis.factChecks.map(check => {
-                        let ratingClass = '';
-                        if (check.rating === 'True' || check.rating === 'Mostly True') {
-                            ratingClass = 'fact-check-true';
-                        } else if (check.rating === 'False' || check.rating === 'Mostly False') {
-                            ratingClass = 'fact-check-false';
-                        } else if (check.rating === 'Mixed') {
-                            ratingClass = 'fact-check-mixed';
-                        } else {
-                            ratingClass = 'fact-check-unverified';
-                        }
-                        
-                        return `
+            })
+            .join("");
+
+          // Generate fact-check HTML
+          let factCheckHTML = "";
+          if (analysis.factChecks.length > 0) {
+            const factCheckItems = analysis.factChecks
+              .map((check) => {
+                let ratingClass = "";
+                if (check.rating === "True" || check.rating === "Mostly True") {
+                  ratingClass = "fact-check-true";
+                } else if (
+                  check.rating === "False" ||
+                  check.rating === "Mostly False"
+                ) {
+                  ratingClass = "fact-check-false";
+                } else if (check.rating === "Mixed") {
+                  ratingClass = "fact-check-mixed";
+                } else {
+                  ratingClass = "fact-check-unverified";
+                }
+
+                return `
                             <div class="fact-check-item ${ratingClass}">
-                                <div class="font-semibold">${check.claim.substring(0, 100)}...</div>
+                                <div class="font-semibold">${check.claim.substring(
+                                  0,
+                                  100
+                                )}...</div>
                                 <div class="flex justify-between mt-1">
-                                    <span class="text-sm">Rating: ${check.rating}</span>
-                                    <span class="text-sm">Confidence: ${check.confidence}%</span>
+                                    <span class="text-sm">Rating: ${
+                                      check.rating
+                                    }</span>
+                                    <span class="text-sm">Confidence: ${
+                                      check.confidence
+                                    }%</span>
                                 </div>
-                                <div class="text-xs mt-1 text-gray-600">Source: ${check.source}</div>
+                                <div class="text-xs mt-1 text-gray-600">Source: ${
+                                  check.source
+                                }</div>
                             </div>
                         `;
-                    }).join('');
-                    
-                    factCheckHTML = `
+              })
+              .join("");
+
+            factCheckHTML = `
                         <div class="mt-6">
                             <h3 class="font-bold text-gray-700 mb-3 flex items-center">
                                 <i class="fas fa-search-check mr-2"></i> Fact-Check Results
@@ -964,29 +1351,37 @@
                             </div>
                         </div>
                     `;
-                }
-                
-                // Display results with animation
-                resultsContainer.innerHTML = `
+          }
+
+          // Display results with animation
+          resultsContainer.innerHTML = `
                     <div class="slide-in">
                         <div class="text-center mb-8">
-                            <div class="text-5xl font-bold ${credibilityClass} mb-2 score-animation">${analysis.credibilityScore}%</div>
+                            <div class="text-5xl font-bold ${credibilityClass} mb-2 score-animation">${
+            analysis.credibilityScore
+          }%</div>
                             <div class="inline-flex items-center px-4 py-2 rounded-full ${credibilityClass} bg-opacity-10 backdrop-blur-sm mb-4">
                                 <span class="font-semibold">${credibilityText}</span>
                             </div>
                             <div class="progress-bar mt-4">
-                                <div class="progress-fill ${progressClass}" style="width: ${analysis.credibilityScore}%"></div>
+                                <div class="progress-fill ${progressClass}" style="width: ${
+            analysis.credibilityScore
+          }%"></div>
                             </div>
                         </div>
                         
                         <div class="grid grid-cols-2 gap-4 mb-6">
                             <div class="bg-blue-50 p-4 rounded-xl text-center interactive-chart">
                                 <div class="text-sm font-medium text-blue-800 mb-1">Sentiment</div>
-                                <div class="text-lg font-bold text-blue-900">${analysis.sentiment}</div>
+                                <div class="text-lg font-bold text-blue-900">${
+                                  analysis.sentiment
+                                }</div>
                             </div>
                             <div class="bg-purple-50 p-4 rounded-xl text-center interactive-chart">
                                 <div class="text-sm font-medium text-purple-800 mb-1">Political Bias</div>
-                                <div class="text-lg font-bold text-purple-900">${analysis.bias}</div>
+                                <div class="text-lg font-bold text-purple-900">${
+                                  analysis.bias
+                                }</div>
                             </div>
                         </div>
                         
@@ -997,21 +1392,29 @@
                             </div>
                         </div>
                         
-                        ${analysis.detectedTechniques.length > 0 ? `
+                        ${
+                          analysis.detectedTechniques.length > 0
+                            ? `
                             <div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
                                 <h3 class="font-bold text-red-700 mb-3 flex items-center">
                                     <i class="fas fa-exclamation-triangle mr-2"></i> Detected Manipulation Techniques
                                 </h3>
                                 <ul class="space-y-2">
-                                    ${analysis.detectedTechniques.map(tech => `
+                                    ${analysis.detectedTechniques
+                                      .map(
+                                        (tech) => `
                                         <li class="text-gray-800 text-sm flex items-start">
                                             <i class="fas fa-circle text-red-500 text-xs mt-1 mr-2"></i>
                                             ${tech}
                                         </li>
-                                    `).join('')}
+                                    `
+                                      )
+                                      .join("")}
                                 </ul>
                             </div>
-                        ` : ''}
+                        `
+                            : ""
+                        }
                         
                         ${factCheckHTML}
                         
@@ -1036,43 +1439,44 @@
                         </div>
                     </div>
                 `;
-                
-                // Animate the progress bar
-                setTimeout(() => {
-                    const progressFill = document.querySelector('.progress-fill');
-                    if (progressFill) {
-                        progressFill.style.width = `${analysis.credibilityScore}%`;
-                    }
-                }, 100);
+
+          // Animate the progress bar
+          setTimeout(() => {
+            const progressFill = document.querySelector(".progress-fill");
+            if (progressFill) {
+              progressFill.style.width = `${analysis.credibilityScore}%`;
             }
-            
-            // Update visualization charts
-            function updateVisualization(analysis) {
-                const factorsChart = document.getElementById('factors-chart');
-                const patternsChart = document.getElementById('patterns-chart');
-                
-                // Update factors chart
-                factorsChart.innerHTML = `
+          }, 100);
+        }
+
+        // Update visualization charts
+        function updateVisualization(analysis) {
+          const factorsChart = document.getElementById("factors-chart");
+          const patternsChart = document.getElementById("patterns-chart");
+
+          // Update factors chart
+          factorsChart.innerHTML = `
                     <div class="space-y-4">
-                        ${analysis.analysisDetails.map(detail => {
-                            let scoreClass = '';
-                            let barWidth = '100%';
-                            let barColor = '#10b981';
-                            
-                            if (detail.score === 'High') {
-                                scoreClass = 'score-high';
-                                barWidth = '90%';
-                                barColor = '#10b981';
-                            } else if (detail.score === 'Medium') {
-                                scoreClass = 'score-medium';
-                                barWidth = '60%';
-                                barColor = '#f59e0b';
-                            } else if (detail.score === 'Low') {
-                                scoreClass = 'score-low';
-                                barWidth = '30%';
-                                barColor = '#ef4444';
+                        ${analysis.analysisDetails
+                          .map((detail) => {
+                            let scoreClass = "";
+                            let barWidth = "100%";
+                            let barColor = "#10b981";
+
+                            if (detail.score === "High") {
+                              scoreClass = "score-high";
+                              barWidth = "90%";
+                              barColor = "#10b981";
+                            } else if (detail.score === "Medium") {
+                              scoreClass = "score-medium";
+                              barWidth = "60%";
+                              barColor = "#f59e0b";
+                            } else if (detail.score === "Low") {
+                              scoreClass = "score-low";
+                              barWidth = "30%";
+                              barColor = "#ef4444";
                             }
-                            
+
                             return `
                                 <div>
                                     <div class="flex justify-between text-sm">
@@ -1084,519 +1488,663 @@
                                     </div>
                                 </div>
                             `;
-                        }).join('')}
+                          })
+                          .join("")}
                     </div>
                 `;
-                
-                // Update patterns chart
-                if (analysis.detectedTechniques.length > 0) {
-                    patternsChart.innerHTML = `
+
+          // Update patterns chart
+          if (analysis.detectedTechniques.length > 0) {
+            patternsChart.innerHTML = `
                         <div class="space-y-3">
-                            ${analysis.detectedTechniques.map(tech => `
+                            ${analysis.detectedTechniques
+                              .map(
+                                (tech) => `
                                 <div class="flex items-center p-3 bg-red-50 rounded-lg">
                                     <i class="fas fa-exclamation-triangle text-red-500 mr-3"></i>
                                     <span class="text-sm font-medium text-red-700">${tech}</span>
                                 </div>
-                            `).join('')}
+                            `
+                              )
+                              .join("")}
                         </div>
                     `;
-                } else {
-                    patternsChart.innerHTML = `
+          } else {
+            patternsChart.innerHTML = `
                         <div class="text-center py-4 text-green-600">
                             <i class="fas fa-check-circle text-3xl mb-2"></i>
                             <p class="font-semibold">No manipulation techniques detected</p>
                             <p class="text-sm mt-1">Content appears credible</p>
                         </div>
                     `;
-                }
-            }
-            
-            // Reset visualization
-            function resetVisualization() {
-                document.getElementById('factors-chart').innerHTML = `
+          }
+        }
+
+        // Reset visualization
+        function resetVisualization() {
+          document.getElementById("factors-chart").innerHTML = `
                     <div class="text-center py-8 text-gray-400">
                         <i class="fas fa-chart-bar text-3xl mb-2"></i>
                         <p>Analyze content to see factor breakdown</p>
                     </div>
                 `;
-                
-                document.getElementById('patterns-chart').innerHTML = `
+
+          document.getElementById("patterns-chart").innerHTML = `
                     <div class="text-center py-8 text-gray-400">
                         <i class="fas fa-search text-3xl mb-2"></i>
                         <p>Manipulation techniques will appear here</p>
                     </div>
                 `;
-            }
-            
-            // The rest of the analysis functions remain the same as in the previous implementation
-            // (analyzeContent, simulateFactCheck, extractClaims functions)
-            // ... [Previous analysis functions code would go here]
-        });
-        
-        // Analysis algorithm (same as before, but included for completeness)
-        function analyzeContent(text, contentType, language) {
-            // Initialize scores
-            let credibilityScore = 100;
-            let detectedTechniques = [];
-            let analysisDetails = [];
-            let factChecks = [];
-            
-            // Calculate text characteristics
-            const wordCount = text.split(/\s+/).length;
-            const sentenceCount = text.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
-            const avgSentenceLength = wordCount / sentenceCount;
-            
-            // 1. Check for emotional manipulation
-            const emotionalWords = ['shocking', 'unbelievable', 'amazing', 'horrifying', 'devastating', 'outrageous', 'heartbreaking', 'terrifying', 'disgusting', 'urgent', 'breaking', 'emergency', 'alert', 'warning'];
-            const emotionalCount = emotionalWords.filter(word => 
-                text.toLowerCase().includes(word)).length;
-            const emotionalDensity = emotionalCount / wordCount * 1000;
-            
-            if (emotionalDensity > 5) {
-                credibilityScore -= 25;
-                detectedTechniques.push('Emotional Manipulation');
-                analysisDetails.push({
-                    criteria: 'Emotional Language',
-                    score: 'Low',
-                    description: 'High use of emotionally charged words to manipulate reader response',
-                    impact: 'High'
-                });
-            } else if (emotionalDensity > 2) {
-                credibilityScore -= 12;
-                analysisDetails.push({
-                    criteria: 'Emotional Language',
-                    score: 'Medium',
-                    description: 'Some emotionally charged language detected',
-                    impact: 'Medium'
-                });
-            } else {
-                analysisDetails.push({
-                    criteria: 'Emotional Language',
-                    score: 'High',
-                    description: 'Minimal use of emotionally manipulative language',
-                    impact: 'Low'
-                });
-            }
-            
-            // 2. Check for sensationalism
-            const sensationalWords = ['secret', 'exposed', 'revealed', 'shocking truth', 'they don\'t want you to know', 'hidden', 'forbidden', 'cover-up', 'whistleblower', 'explosive', 'leaked'];
-            const sensationalCount = sensationalWords.filter(word => 
-                text.toLowerCase().includes(word)).length;
-            const sensationalDensity = sensationalCount / wordCount * 1000;
-            
-            if (sensationalDensity > 3) {
-                credibilityScore -= 20;
-                detectedTechniques.push('Sensationalism');
-                analysisDetails.push({
-                    criteria: 'Sensational Language',
-                    score: 'Low',
-                    description: 'Content uses sensational language to attract attention',
-                    impact: 'High'
-                });
-            } else if (sensationalDensity > 1) {
-                credibilityScore -= 8;
-                analysisDetails.push({
-                    criteria: 'Sensational Language',
-                    score: 'Medium',
-                    description: 'Some sensational language detected',
-                    impact: 'Medium'
-                });
-            } else {
-                analysisDetails.push({
-                    criteria: 'Sensational Language',
-                    score: 'High',
-                    description: 'Minimal use of sensational language',
-                    impact: 'Low'
-                });
-            }
-            
-            // 3. Check for source citations
-            const sourcePatterns = [
-                /according to [a-zA-Z ]+/gi,
-                /source:/gi,
-                /references?:/gi,
-                /\[[0-9]+\]/g,
-                /\([0-9]{4}\)/g,
-                /published in/gi,
-                /peer-reviewed/gi,
-                /study shows/gi,
-                /research indicates/gi
-            ];
-            
-            const hasSources = sourcePatterns.some(pattern => pattern.test(text));
-            const urlPattern = /https?:\/\/[^\s]+/g;
-            const urls = text.match(urlPattern) || [];
-            const credibleDomains = ['.gov', '.edu', 'who.int', 'reuters.com', 'apnews.com', 'bbc.com', 'nature.com', 'science.org', 'nasa.gov', 'thelancet.com', 'jamanetwork.com'];
-            const hasCredibleUrls = urls.some(url => credibleDomains.some(domain => url.includes(domain)));
-            
-            if (!hasSources && !hasCredibleUrls) {
-                credibilityScore -= 30;
-                detectedTechniques.push('Lack of Credible Sources');
-                analysisDetails.push({
-                    criteria: 'Source Attribution',
-                    score: 'Low',
-                    description: 'No credible sources or references cited',
-                    impact: 'High'
-                });
-            } else if (hasSources && hasCredibleUrls) {
-                credibilityScore += 15;
-                analysisDetails.push({
-                    criteria: 'Source Attribution',
-                    score: 'High',
-                    description: 'Content includes references to credible sources',
-                    impact: 'Low'
-                });
-            } else {
-                credibilityScore -= 5;
-                analysisDetails.push({
-                    criteria: 'Source Attribution',
-                    score: 'Medium',
-                    description: 'Some references provided but source credibility unclear',
-                    impact: 'Medium'
-                });
-            }
-            
-            // 4. Check for balanced perspective
-            const biasedWords = ['always', 'never', 'everyone knows', 'obviously', 'clearly', 'undoubtedly', 'without a doubt', 'certainly', 'wake up', 'truth', 'real story'];
-            const biasedCount = biasedWords.filter(word => 
-                text.toLowerCase().includes(word)).length;
-            const biasedDensity = biasedCount / wordCount * 1000;
-            
-            if (biasedDensity > 3) {
-                credibilityScore -= 18;
-                detectedTechniques.push('Overgeneralization');
-                analysisDetails.push({
-                    criteria: 'Balanced Perspective',
-                    score: 'Low',
-                    description: 'Content shows signs of overgeneralization and bias',
-                    impact: 'High'
-                });
-            } else if (biasedDensity > 1) {
-                credibilityScore -= 7;
-                analysisDetails.push({
-                    criteria: 'Balanced Perspective',
-                    score: 'Medium',
-                    description: 'Some biased language detected',
-                    impact: 'Medium'
-                });
-            } else {
-                analysisDetails.push({
-                    criteria: 'Balanced Perspective',
-                    score: 'High',
-                    description: 'Content maintains relatively balanced perspective',
-                    impact: 'Low'
-                });
-            }
-            
-            // 5. Check for clickbait patterns
-            const clickbaitPatterns = [
-                /you won[']?t believe/gi,
-                /what happens next/gi,
-                /number [0-9] will shock you/gi,
-                /this is why/gi,
-                /the reason is/gi,
-                /do this to/gi,
-                /the secret to/gi,
-                /this one trick/gi,
-                /share this/gi,
-                /forward this/gi
-            ];
-            
-            const hasClickbait = clickbaitPatterns.some(pattern => pattern.test(text));
-            
-            if (hasClickbait) {
-                credibilityScore -= 20;
-                detectedTechniques.push('Clickbait Tactics');
-                analysisDetails.push({
-                    criteria: 'Clickbait Indicators',
-                    score: 'Low',
-                    description: 'Content uses clickbait patterns to attract attention',
-                    impact: 'High'
-                });
-            } else {
-                analysisDetails.push({
-                    criteria: 'Clickbait Indicators',
-                    score: 'High',
-                    description: 'No obvious clickbait patterns detected',
-                    impact: 'Low'
-                });
-            }
-            
-            // 6. Check for logical fallacies
-            const fallacyPatterns = [
-                /everyone is doing it/gi,
-                /since [^,]+ then [^,]+/gi,
-                /if you don't [^,]+ then [^,]+/gi,
-                /real [a-z]+ know/gi,
-                /no true [a-z]+ would/gi,
-                /big [a-z]+ wants/gi,
-                /they don't want you to know/gi
-            ];
-            
-            const hasFallacies = fallacyPatterns.some(pattern => pattern.test(text));
-            
-            if (hasFallacies) {
-                credibilityScore -= 15;
-                detectedTechniques.push('Logical Fallacies');
-                analysisDetails.push({
-                    criteria: 'Logical Consistency',
-                    score: 'Low',
-                    description: 'Content contains potential logical fallacies',
-                    impact: 'Medium'
-                });
-            } else {
-                analysisDetails.push({
-                    criteria: 'Logical Consistency',
-                    score: 'High',
-                    description: 'Content appears logically consistent',
-                    impact: 'Low'
-                });
-            }
-            
-            // 7. Check for fact-checkable claims
-            const claimPatterns = [
-                /studies show/gi,
-                /research indicates/gi,
-                /scientists say/gi,
-                /experts agree/gi,
-                /statistics show/gi,
-                /[0-9]+% of/gi,
-                /according to research/gi,
-                /cures/gi,
-                /miracle/gi,
-                /proves/gi,
-                /causes cancer/gi,
-                /mind control/gi
-            ];
-            
-            const hasClaims = claimPatterns.some(pattern => pattern.test(text));
-            
-            if (hasClaims && !hasSources) {
-                credibilityScore -= 15;
-                analysisDetails.push({
-                    criteria: 'Verifiable Claims',
-                    score: 'Low',
-                    description: 'Makes claims without providing verifiable sources',
-                    impact: 'Medium'
-                });
-            } else if (hasClaims && hasSources) {
-                analysisDetails.push({
-                    criteria: 'Verifiable Claims',
-                    score: 'Medium',
-                    description: 'Makes claims with some source attribution',
-                    impact: 'Low'
-                });
-            } else {
-                analysisDetails.push({
-                    criteria: 'Verifiable Claims',
-                    score: 'High',
-                    description: 'Limited unverifiable claims detected',
-                    impact: 'Low'
-                });
-            }
-            
-            // 8. Check for writing quality
-            if (avgSentenceLength > 25) {
-                credibilityScore -= 3;
-                analysisDetails.push({
-                    criteria: 'Readability',
-                    score: 'Medium',
-                    description: 'Complex sentence structure may indicate poor writing quality',
-                    impact: 'Low'
-                });
-            } else if (avgSentenceLength < 8) {
-                credibilityScore -= 5;
-                analysisDetails.push({
-                    criteria: 'Readability',
-                    score: 'Medium',
-                    description: 'Overly simplistic writing may indicate low-quality content',
-                    impact: 'Low'
-                });
-            } else {
-                analysisDetails.push({
-                    criteria: 'Readability',
-                    score: 'High',
-                    description: 'Appropriate sentence structure and readability',
-                    impact: 'Low'
-                });
-            }
-            
-            // Content-specific adjustments
-            if (contentType === 'social') {
-                // Social media content tends to be less formal and more opinionated
-                credibilityScore += 3;
-            } else if (contentType === 'news') {
-                // News content should have higher standards
-                if (!hasSources) credibilityScore -= 10;
-            }
-            
-            // Simulate fact-checking API results
-            factChecks = simulateFactCheck(text);
-            
-            // Add random variation to prevent always getting the same score
-            const randomVariation = (Math.random() * 8) - 4; // -4 to +4
-            credibilityScore += randomVariation;
-            
-            // Ensure score is within bounds
-            credibilityScore = Math.max(0, Math.min(100, Math.round(credibilityScore)));
-            
-            // Determine sentiment
-            const positiveWords = ['good', 'great', 'excellent', 'positive', 'beneficial', 'success', 'improve', 'better', 'advantage'];
-            const negativeWords = ['bad', 'terrible', 'negative', 'harmful', 'failure', 'problem', 'worse', 'dangerous', 'threat'];
-            
-            let positiveCount = positiveWords.filter(word => 
-                text.toLowerCase().includes(word)).length;
-            let negativeCount = negativeWords.filter(word => 
-                text.toLowerCase().includes(word)).length;
-            
-            let sentiment = 'Neutral';
-            if (positiveCount > negativeCount + 2) sentiment = 'Positive';
-            if (negativeCount > positiveCount + 2) sentiment = 'Negative';
-            
-            // Determine bias (simplified)
-            const leftTerms = ['progressive', 'equality', 'climate change', 'social justice', 'universal healthcare', 'diversity'];
-            const rightTerms = ['conservative', 'tradition', 'free market', 'national security', 'tax cuts', 'individual liberty'];
-            
-            let leftCount = leftTerms.filter(term => 
-                text.toLowerCase().includes(term)).length;
-            let rightCount = rightTerms.filter(term => 
-                text.toLowerCase().includes(term)).length;
-            
-            let bias = 'Centrist';
-            if (leftCount > rightCount + 1) bias = 'Left-leaning';
-            if (rightCount > leftCount + 1) bias = 'Right-leaning';
-            
-            return {
-                credibilityScore,
-                detectedTechniques,
-                analysisDetails,
-                factChecks,
-                sentiment,
-                bias
-            };
         }
-        
+
+        // The rest of the analysis functions remain the same as in the previous implementation
+        // (analyzeContent, simulateFactCheck, extractClaims functions)
+        // ... [Previous analysis functions code would go here]
+      });
+
+      // Analysis algorithm (same as before, but included for completeness)
+      function analyzeContent(text, contentType, language) {
+        // Initialize scores
+        let credibilityScore = 100;
+        let detectedTechniques = [];
+        let analysisDetails = [];
+        let factChecks = [];
+
+        // Calculate text characteristics
+        const wordCount = text.split(/\s+/).length;
+        const sentenceCount = text
+          .split(/[.!?]+/)
+          .filter((s) => s.trim().length > 0).length;
+        const avgSentenceLength = wordCount / sentenceCount;
+
+        // 1. Check for emotional manipulation
+        const emotionalWords = [
+          "shocking",
+          "unbelievable",
+          "amazing",
+          "horrifying",
+          "devastating",
+          "outrageous",
+          "heartbreaking",
+          "terrifying",
+          "disgusting",
+          "urgent",
+          "breaking",
+          "emergency",
+          "alert",
+          "warning",
+        ];
+        const emotionalCount = emotionalWords.filter((word) =>
+          text.toLowerCase().includes(word)
+        ).length;
+        const emotionalDensity = (emotionalCount / wordCount) * 1000;
+
+        if (emotionalDensity > 5) {
+          credibilityScore -= 25;
+          detectedTechniques.push("Emotional Manipulation");
+          analysisDetails.push({
+            criteria: "Emotional Language",
+            score: "Low",
+            description:
+              "High use of emotionally charged words to manipulate reader response",
+            impact: "High",
+          });
+        } else if (emotionalDensity > 2) {
+          credibilityScore -= 12;
+          analysisDetails.push({
+            criteria: "Emotional Language",
+            score: "Medium",
+            description: "Some emotionally charged language detected",
+            impact: "Medium",
+          });
+        } else {
+          analysisDetails.push({
+            criteria: "Emotional Language",
+            score: "High",
+            description: "Minimal use of emotionally manipulative language",
+            impact: "Low",
+          });
+        }
+
+        // 2. Check for sensationalism
+        const sensationalWords = [
+          "secret",
+          "exposed",
+          "revealed",
+          "shocking truth",
+          "they don't want you to know",
+          "hidden",
+          "forbidden",
+          "cover-up",
+          "whistleblower",
+          "explosive",
+          "leaked",
+        ];
+        const sensationalCount = sensationalWords.filter((word) =>
+          text.toLowerCase().includes(word)
+        ).length;
+        const sensationalDensity = (sensationalCount / wordCount) * 1000;
+
+        if (sensationalDensity > 3) {
+          credibilityScore -= 20;
+          detectedTechniques.push("Sensationalism");
+          analysisDetails.push({
+            criteria: "Sensational Language",
+            score: "Low",
+            description:
+              "Content uses sensational language to attract attention",
+            impact: "High",
+          });
+        } else if (sensationalDensity > 1) {
+          credibilityScore -= 8;
+          analysisDetails.push({
+            criteria: "Sensational Language",
+            score: "Medium",
+            description: "Some sensational language detected",
+            impact: "Medium",
+          });
+        } else {
+          analysisDetails.push({
+            criteria: "Sensational Language",
+            score: "High",
+            description: "Minimal use of sensational language",
+            impact: "Low",
+          });
+        }
+
+        // 3. Check for source citations
+        const sourcePatterns = [
+          /according to [a-zA-Z ]+/gi,
+          /source:/gi,
+          /references?:/gi,
+          /\[[0-9]+\]/g,
+          /\([0-9]{4}\)/g,
+          /published in/gi,
+          /peer-reviewed/gi,
+          /study shows/gi,
+          /research indicates/gi,
+        ];
+
+        const hasSources = sourcePatterns.some((pattern) => pattern.test(text));
+        const urlPattern = /https?:\/\/[^\s]+/g;
+        const urls = text.match(urlPattern) || [];
+        const credibleDomains = [
+          ".gov",
+          ".edu",
+          "who.int",
+          "reuters.com",
+          "apnews.com",
+          "bbc.com",
+          "nature.com",
+          "science.org",
+          "nasa.gov",
+          "thelancet.com",
+          "jamanetwork.com",
+        ];
+        const hasCredibleUrls = urls.some((url) =>
+          credibleDomains.some((domain) => url.includes(domain))
+        );
+
+        if (!hasSources && !hasCredibleUrls) {
+          credibilityScore -= 30;
+          detectedTechniques.push("Lack of Credible Sources");
+          analysisDetails.push({
+            criteria: "Source Attribution",
+            score: "Low",
+            description: "No credible sources or references cited",
+            impact: "High",
+          });
+        } else if (hasSources && hasCredibleUrls) {
+          credibilityScore += 15;
+          analysisDetails.push({
+            criteria: "Source Attribution",
+            score: "High",
+            description: "Content includes references to credible sources",
+            impact: "Low",
+          });
+        } else {
+          credibilityScore -= 5;
+          analysisDetails.push({
+            criteria: "Source Attribution",
+            score: "Medium",
+            description:
+              "Some references provided but source credibility unclear",
+            impact: "Medium",
+          });
+        }
+
+        // 4. Check for balanced perspective
+        const biasedWords = [
+          "always",
+          "never",
+          "everyone knows",
+          "obviously",
+          "clearly",
+          "undoubtedly",
+          "without a doubt",
+          "certainly",
+          "wake up",
+          "truth",
+          "real story",
+        ];
+        const biasedCount = biasedWords.filter((word) =>
+          text.toLowerCase().includes(word)
+        ).length;
+        const biasedDensity = (biasedCount / wordCount) * 1000;
+
+        if (biasedDensity > 3) {
+          credibilityScore -= 18;
+          detectedTechniques.push("Overgeneralization");
+          analysisDetails.push({
+            criteria: "Balanced Perspective",
+            score: "Low",
+            description: "Content shows signs of overgeneralization and bias",
+            impact: "High",
+          });
+        } else if (biasedDensity > 1) {
+          credibilityScore -= 7;
+          analysisDetails.push({
+            criteria: "Balanced Perspective",
+            score: "Medium",
+            description: "Some biased language detected",
+            impact: "Medium",
+          });
+        } else {
+          analysisDetails.push({
+            criteria: "Balanced Perspective",
+            score: "High",
+            description: "Content maintains relatively balanced perspective",
+            impact: "Low",
+          });
+        }
+
+        // 5. Check for clickbait patterns
+        const clickbaitPatterns = [
+          /you won[']?t believe/gi,
+          /what happens next/gi,
+          /number [0-9] will shock you/gi,
+          /this is why/gi,
+          /the reason is/gi,
+          /do this to/gi,
+          /the secret to/gi,
+          /this one trick/gi,
+          /share this/gi,
+          /forward this/gi,
+        ];
+
+        const hasClickbait = clickbaitPatterns.some((pattern) =>
+          pattern.test(text)
+        );
+
+        if (hasClickbait) {
+          credibilityScore -= 20;
+          detectedTechniques.push("Clickbait Tactics");
+          analysisDetails.push({
+            criteria: "Clickbait Indicators",
+            score: "Low",
+            description: "Content uses clickbait patterns to attract attention",
+            impact: "High",
+          });
+        } else {
+          analysisDetails.push({
+            criteria: "Clickbait Indicators",
+            score: "High",
+            description: "No obvious clickbait patterns detected",
+            impact: "Low",
+          });
+        }
+
+        // 6. Check for logical fallacies
+        const fallacyPatterns = [
+          /everyone is doing it/gi,
+          /since [^,]+ then [^,]+/gi,
+          /if you don't [^,]+ then [^,]+/gi,
+          /real [a-z]+ know/gi,
+          /no true [a-z]+ would/gi,
+          /big [a-z]+ wants/gi,
+          /they don't want you to know/gi,
+        ];
+
+        const hasFallacies = fallacyPatterns.some((pattern) =>
+          pattern.test(text)
+        );
+
+        if (hasFallacies) {
+          credibilityScore -= 15;
+          detectedTechniques.push("Logical Fallacies");
+          analysisDetails.push({
+            criteria: "Logical Consistency",
+            score: "Low",
+            description: "Content contains potential logical fallacies",
+            impact: "Medium",
+          });
+        } else {
+          analysisDetails.push({
+            criteria: "Logical Consistency",
+            score: "High",
+            description: "Content appears logically consistent",
+            impact: "Low",
+          });
+        }
+
+        // 7. Check for fact-checkable claims
+        const claimPatterns = [
+          /studies show/gi,
+          /research indicates/gi,
+          /scientists say/gi,
+          /experts agree/gi,
+          /statistics show/gi,
+          /[0-9]+% of/gi,
+          /according to research/gi,
+          /cures/gi,
+          /miracle/gi,
+          /proves/gi,
+          /causes cancer/gi,
+          /mind control/gi,
+        ];
+
+        const hasClaims = claimPatterns.some((pattern) => pattern.test(text));
+
+        if (hasClaims && !hasSources) {
+          credibilityScore -= 15;
+          analysisDetails.push({
+            criteria: "Verifiable Claims",
+            score: "Low",
+            description: "Makes claims without providing verifiable sources",
+            impact: "Medium",
+          });
+        } else if (hasClaims && hasSources) {
+          analysisDetails.push({
+            criteria: "Verifiable Claims",
+            score: "Medium",
+            description: "Makes claims with some source attribution",
+            impact: "Low",
+          });
+        } else {
+          analysisDetails.push({
+            criteria: "Verifiable Claims",
+            score: "High",
+            description: "Limited unverifiable claims detected",
+            impact: "Low",
+          });
+        }
+
+        // 8. Check for writing quality
+        if (avgSentenceLength > 25) {
+          credibilityScore -= 3;
+          analysisDetails.push({
+            criteria: "Readability",
+            score: "Medium",
+            description:
+              "Complex sentence structure may indicate poor writing quality",
+            impact: "Low",
+          });
+        } else if (avgSentenceLength < 8) {
+          credibilityScore -= 5;
+          analysisDetails.push({
+            criteria: "Readability",
+            score: "Medium",
+            description:
+              "Overly simplistic writing may indicate low-quality content",
+            impact: "Low",
+          });
+        } else {
+          analysisDetails.push({
+            criteria: "Readability",
+            score: "High",
+            description: "Appropriate sentence structure and readability",
+            impact: "Low",
+          });
+        }
+
+        // Content-specific adjustments
+        if (contentType === "social") {
+          // Social media content tends to be less formal and more opinionated
+          credibilityScore += 3;
+        } else if (contentType === "news") {
+          // News content should have higher standards
+          if (!hasSources) credibilityScore -= 10;
+        }
+
         // Simulate fact-checking API results
-        function simulateFactCheck(text) {
-            const factChecks = [];
-            const claims = extractClaims(text);
-            
-            claims.forEach(claim => {
-                // More realistic fact-check simulation based on claim content
-                let rating, confidence, source;
-                
-                // Check for common misinformation patterns
-                if (claim.toLowerCase().includes('cure') || claim.toLowerCase().includes('miracle')) {
-                    rating = 'False';
-                    confidence = 92;
-                    source = 'Medical Fact Check';
-                } else if (claim.toLowerCase().includes('conspiracy') || claim.toLowerCase().includes('secret government') || claim.toLowerCase().includes('5g')) {
-                    rating = 'False';
-                    confidence = 95;
-                    source = 'PolitiFact';
-                } else if (claim.toLowerCase().includes('flat earth') || claim.toLowerCase().includes('moon landing fake')) {
-                    rating = 'False';
-                    confidence = 98;
-                    source = 'Science Feedback';
-                } else if (claim.toLowerCase().includes('mind control') || claim.toLowerCase().includes('surveillance')) {
-                    rating = 'False';
-                    confidence = 90;
-                    source = 'Snopes';
-                } else if (claim.toLowerCase().includes('study') || claim.toLowerCase().includes('research')) {
-                    // Check if it's credible science
-                    if (text.toLowerCase().includes('nature') || text.toLowerCase().includes('science') || text.toLowerCase().includes('nasa') || text.toLowerCase().includes('lancet')) {
-                        rating = 'True';
-                        confidence = 88;
-                        source = 'Science Feedback';
-                    } else {
-                        rating = 'Mixed';
-                        confidence = 65;
-                        source = 'FactCheck.org';
-                    }
-                } else if (text.toLowerCase().includes('who') || text.toLowerCase().includes('world health organization')) {
-                    rating = 'True';
-                    confidence = 90;
-                    source = 'Reuters Fact Check';
-                } else if (text.toLowerCase().includes('imf') || text.toLowerCase().includes('federal reserve')) {
-                    rating = 'True';
-                    confidence = 85;
-                    source = 'AP News';
-                } else {
-                    // Random distribution for other claims
-                    const rand = Math.random();
-                    if (rand > 0.7) {
-                        rating = 'True';
-                        confidence = 85 + Math.random() * 10;
-                        source = 'AP News';
-                    } else if (rand > 0.4) {
-                        rating = 'Mostly True';
-                        confidence = 75 + Math.random() * 10;
-                        source = 'Google Fact Check';
-                    } else if (rand > 0.2) {
-                        rating = 'Mixed';
-                        confidence = 60 + Math.random() * 15;
-                        source = 'Snopes';
-                    } else if (rand > 0.1) {
-                        rating = 'Mostly False';
-                        confidence = 70 + Math.random() * 15;
-                        source = 'FactCheck.org';
-                    } else {
-                        rating = 'False';
-                        confidence = 80 + Math.random() * 15;
-                        source = 'PolitiFact';
-                    }
-                }
-                
-                factChecks.push({
-                    claim: claim,
-                    rating: rating,
-                    confidence: Math.round(confidence),
-                    source: source
-                });
-            });
-            
-            return factChecks;
-        }
-        
-        // Extract potential claims from text
-        function extractClaims(text) {
-            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
-            const claims = [];
-            
-            // Look for sentences that make factual assertions
-            const claimIndicators = [
-                /is [^.!?]*(cause|result|effect|reason)/gi,
-                /studies show/gi,
-                /research indicates/gi,
-                /[0-9]+% of/gi,
-                /leads to/gi,
-                /results in/gi,
-                /proves that/gi,
-                /cures/gi,
-                /miracle/gi,
-                /secret/gi,
-                /government/gi,
-                /vaccine/gi,
-                /cancer/gi,
-                /mind control/gi,
-                /surveillance/gi
-            ];
-            
-            sentences.forEach(sentence => {
-                if (claimIndicators.some(pattern => pattern.test(sentence)) && 
-                    sentence.split(' ').length > 5) {
-                    claims.push(sentence.trim());
-                }
-            });
-            
-            // If no specific claims found, use first few sentences
-            if (claims.length === 0 && sentences.length > 0) {
-                claims.push(sentences[0].trim());
-                if (sentences.length > 1) claims.push(sentences[1].trim());
+        factChecks = simulateFactCheck(text);
+
+        // Add random variation to prevent always getting the same score
+        const randomVariation = Math.random() * 8 - 4; // -4 to +4
+        credibilityScore += randomVariation;
+
+        // Ensure score is within bounds
+        credibilityScore = Math.max(
+          0,
+          Math.min(100, Math.round(credibilityScore))
+        );
+
+        // Determine sentiment
+        const positiveWords = [
+          "good",
+          "great",
+          "excellent",
+          "positive",
+          "beneficial",
+          "success",
+          "improve",
+          "better",
+          "advantage",
+        ];
+        const negativeWords = [
+          "bad",
+          "terrible",
+          "negative",
+          "harmful",
+          "failure",
+          "problem",
+          "worse",
+          "dangerous",
+          "threat",
+        ];
+
+        let positiveCount = positiveWords.filter((word) =>
+          text.toLowerCase().includes(word)
+        ).length;
+        let negativeCount = negativeWords.filter((word) =>
+          text.toLowerCase().includes(word)
+        ).length;
+
+        let sentiment = "Neutral";
+        if (positiveCount > negativeCount + 2) sentiment = "Positive";
+        if (negativeCount > positiveCount + 2) sentiment = "Negative";
+
+        // Determine bias (simplified)
+        const leftTerms = [
+          "progressive",
+          "equality",
+          "climate change",
+          "social justice",
+          "universal healthcare",
+          "diversity",
+        ];
+        const rightTerms = [
+          "conservative",
+          "tradition",
+          "free market",
+          "national security",
+          "tax cuts",
+          "individual liberty",
+        ];
+
+        let leftCount = leftTerms.filter((term) =>
+          text.toLowerCase().includes(term)
+        ).length;
+        let rightCount = rightTerms.filter((term) =>
+          text.toLowerCase().includes(term)
+        ).length;
+
+        let bias = "Centrist";
+        if (leftCount > rightCount + 1) bias = "Left-leaning";
+        if (rightCount > leftCount + 1) bias = "Right-leaning";
+
+        return {
+          credibilityScore,
+          detectedTechniques,
+          analysisDetails,
+          factChecks,
+          sentiment,
+          bias,
+        };
+      }
+
+      // Simulate fact-checking API results
+      function simulateFactCheck(text) {
+        const factChecks = [];
+        const claims = extractClaims(text);
+
+        claims.forEach((claim) => {
+          // More realistic fact-check simulation based on claim content
+          let rating, confidence, source;
+
+          // Check for common misinformation patterns
+          if (
+            claim.toLowerCase().includes("cure") ||
+            claim.toLowerCase().includes("miracle")
+          ) {
+            rating = "False";
+            confidence = 92;
+            source = "Medical Fact Check";
+          } else if (
+            claim.toLowerCase().includes("conspiracy") ||
+            claim.toLowerCase().includes("secret government") ||
+            claim.toLowerCase().includes("5g")
+          ) {
+            rating = "False";
+            confidence = 95;
+            source = "PolitiFact";
+          } else if (
+            claim.toLowerCase().includes("flat earth") ||
+            claim.toLowerCase().includes("moon landing fake")
+          ) {
+            rating = "False";
+            confidence = 98;
+            source = "Science Feedback";
+          } else if (
+            claim.toLowerCase().includes("mind control") ||
+            claim.toLowerCase().includes("surveillance")
+          ) {
+            rating = "False";
+            confidence = 90;
+            source = "Snopes";
+          } else if (
+            claim.toLowerCase().includes("study") ||
+            claim.toLowerCase().includes("research")
+          ) {
+            // Check if it's credible science
+            if (
+              text.toLowerCase().includes("nature") ||
+              text.toLowerCase().includes("science") ||
+              text.toLowerCase().includes("nasa") ||
+              text.toLowerCase().includes("lancet")
+            ) {
+              rating = "True";
+              confidence = 88;
+              source = "Science Feedback";
+            } else {
+              rating = "Mixed";
+              confidence = 65;
+              source = "FactCheck.org";
             }
-            
-            return claims.slice(0, 3); // Limit to 3 claims
+          } else if (
+            text.toLowerCase().includes("who") ||
+            text.toLowerCase().includes("world health organization")
+          ) {
+            rating = "True";
+            confidence = 90;
+            source = "Reuters Fact Check";
+          } else if (
+            text.toLowerCase().includes("imf") ||
+            text.toLowerCase().includes("federal reserve")
+          ) {
+            rating = "True";
+            confidence = 85;
+            source = "AP News";
+          } else {
+            // Random distribution for other claims
+            const rand = Math.random();
+            if (rand > 0.7) {
+              rating = "True";
+              confidence = 85 + Math.random() * 10;
+              source = "AP News";
+            } else if (rand > 0.4) {
+              rating = "Mostly True";
+              confidence = 75 + Math.random() * 10;
+              source = "Google Fact Check";
+            } else if (rand > 0.2) {
+              rating = "Mixed";
+              confidence = 60 + Math.random() * 15;
+              source = "Snopes";
+            } else if (rand > 0.1) {
+              rating = "Mostly False";
+              confidence = 70 + Math.random() * 15;
+              source = "FactCheck.org";
+            } else {
+              rating = "False";
+              confidence = 80 + Math.random() * 15;
+              source = "PolitiFact";
+            }
+          }
+
+          factChecks.push({
+            claim: claim,
+            rating: rating,
+            confidence: Math.round(confidence),
+            source: source,
+          });
+        });
+
+        return factChecks;
+      }
+
+      // Extract potential claims from text
+      function extractClaims(text) {
+        const sentences = text
+          .split(/[.!?]+/)
+          .filter((s) => s.trim().length > 0);
+        const claims = [];
+
+        // Look for sentences that make factual assertions
+        const claimIndicators = [
+          /is [^.!?]*(cause|result|effect|reason)/gi,
+          /studies show/gi,
+          /research indicates/gi,
+          /[0-9]+% of/gi,
+          /leads to/gi,
+          /results in/gi,
+          /proves that/gi,
+          /cures/gi,
+          /miracle/gi,
+          /secret/gi,
+          /government/gi,
+          /vaccine/gi,
+          /cancer/gi,
+          /mind control/gi,
+          /surveillance/gi,
+        ];
+
+        sentences.forEach((sentence) => {
+          if (
+            claimIndicators.some((pattern) => pattern.test(sentence)) &&
+            sentence.split(" ").length > 5
+          ) {
+            claims.push(sentence.trim());
+          }
+        });
+
+        // If no specific claims found, use first few sentences
+        if (claims.length === 0 && sentences.length > 0) {
+          claims.push(sentences[0].trim());
+          if (sentences.length > 1) claims.push(sentences[1].trim());
         }
+
+        return claims.slice(0, 3); // Limit to 3 claims
+      }
     </script>
-</body>
+  </body>
 </html>
